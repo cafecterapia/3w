@@ -1,0 +1,47 @@
+Stage 2: User Authentication
+Objective: Implement the login and registration functionality using Auth.js.
+File: src/lib/auth.ts
+Action: Configure the NextAuth options. Set up the PrismaAdapter to connect Auth.js to your database. Define your chosen authentication providers (e.g., Google, GitHub, Email) and include their respective client IDs and secrets. Specify the session strategy (JWT is recommended) and set the custom signIn page path to /login.
+File: src/app/api/auth/[...nextauth]/route.ts
+Action: Create the catch-all API route for Auth.js. This file should only export the GET and POST handlers from your src/lib/auth.ts configuration.
+File: .env.local
+Action: Add the required environment variables for Auth.js. This includes AUTH_SECRET (a randomly generated secret key) and the client ID/secret for each provider you configured (e.g., AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET).
+
+Stage 3: Protected Routes & Session Management
+Objective: Secure application pages, ensuring only authenticated users can access them.
+File: src/app/(main)/dashboard/page.tsx
+Action: Convert this into a Server Component. Inside the component, call the auth() function from src/lib/auth.ts to retrieve the user's session. If the session is null (user is not logged in), use the redirect function from next/navigation to send them to the /login page.
+File: src/app/(main)/layout.tsx
+Action: Fetch the user session within this shared layout. This makes the session data available to all child pages (dashboard, billing, settings) and allows you to conditionally render UI elements, such as a user profile dropdown in the header.tsx component.
+
+Stage 4: Core Logic - Subscription Creation
+Objective: Connect the frontend to the Efi payment service via a secure backend endpoint.
+File: src/lib/efi.ts
+Action: Initialize the Efi SDK with your credentials (Client ID, Client Secret) from .env.local. Configure it for the correct environment (sandbox or production) and export the initialized client.
+File: src/app/api/payments/create-subscription/route.ts
+Action: Implement the POST handler for this API route. This is your Backend-for-Frontend (BFF).
+Secure the endpoint by verifying the user's session.
+Implement the server-to-server logic to call the Efi SDK to create a new subscription plan or charge.
+Upon a successful call to Efi, update the corresponding User record in your database via Prisma with the efiSubscriptionId and an initial status (e.g., "PENDING").
+Return the payment URL or necessary details from Efi to the client in a JSON response.
+File: src/components/features/pricing-table.tsx
+Action: This is a Client Component. The "Subscribe" button's onClick handler will make a fetch request to your /api/payments/create-subscription endpoint. Upon receiving a successful response, it will use the Next.js router to redirect the user to the payment URL provided by your API.
+
+Stage 5: Closing the Loop - Payment Webhooks
+Objective: Automatically update user subscription status based on events from Efi.
+File: src/app/api/webhooks/efi/route.ts
+Action: Implement the POST handler for incoming webhooks.
+Crucially, add logic to verify the webhook's signature to ensure the request is genuinely from Efi.
+Parse the event payload to identify the event type (e.g., payment success, subscription cancellation) and the associated efiSubscriptionId.
+Use the efiSubscriptionId to find the corresponding User in your database.
+Update the user's subscriptionStatus and currentPeriodEnd fields based on the event data.
+Return a 200 OK response to acknowledge successful receipt of the webhook.
+
+Stage 6: User Experience - Push Notifications
+Objective: Enable PWA push notifications for key events.
+File: src/hooks/use-push-manager.ts
+Action: Create a custom React hook to encapsulate the browser's Push API logic. This hook should handle asking for user permission, retrieving the push subscription object, and sending it to your backend.
+File: src/app/api/push/subscribe/route.ts
+Action: Implement the POST handler. It will receive the push subscription object from the client. Secure the endpoint, then save this JSON object to a new field on the User model in your database.
+File: src/app/api/push/send-notification/route.ts
+Action: Create a secure endpoint that can be triggered by your backend logic (e.g., after a successful payment webhook). This endpoint will retrieve a user's saved push subscription from the database and use a library like web-push to send a notification to their device.

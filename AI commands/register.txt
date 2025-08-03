@@ -1,0 +1,38 @@
+Workflow: Implementing User Registration
+
+Step 1: Create the Server Action
+First, you need a server-side function that will receive the form data, validate it, and create the user in your database.
+Create a new file: src/app/(auth)/register/actions.ts
+Action: This file will contain the logic for user registration. It will be marked with "use server" to designate it as a Server Action. This function will:
+Receive the form data.
+Ideally, use a library like Zod for data validation.
+Hash the password using a library like bcryptjs. Never store plain text passwords.
+Use your Prisma client to create a new user in the database.
+Redirect the user to the login page upon successful registration using redirect from next/navigation.
+
+Step 2: Convert the Register Page to a Client Component
+To handle form state, like displaying error messages or loading indicators, you need to convert your registration page into a Client Component.
+Modify the file: src/app/(auth)/register/page.tsx
+Action:
+Add "use client"; to the very top of the file.
+Import the useActionState hook from React. This hook is designed to manage form state during Server Action submissions.[4][5]
+Import the registerUser action you created in the actions.ts file.
+
+Step 3: Connect the Form to the Server Action
+Now, you'll update the <form> element to use the Server Action and the state management hook.
+Modify the file: src/app/(auth)/register/page.tsx
+Action:
+Inside your RegisterPage component, call the useActionState hook, passing it your registerUser action and an initial state object (e.g., { message: null }). This will return the current state and a new formAction to be used by the form.
+Update the <form> tag. Remove the default className and add the action prop, setting it to the formAction returned by the hook: <form action={formAction} className="mt-8 space-y-6">.
+Below the page title (<h2>), add a paragraph to display any error or success messages returned from the server: <p>{state?.message}</p>.
+
+Step 4: Provide User Feedback (Optional but Recommended)
+To improve the user experience, you should disable the button while the form is submitting.
+Modify the file: src/app/(auth)/register/page.tsx
+Action:
+Import the useFormStatus hook from react-dom.
+Create a new component, for example, SubmitButton, inside the same file.
+Inside SubmitButton, call useFormStatus. This hook provides a pending property, which is true when the form is submitting.
+Use the pending status to disable the button and show a loading text (e.g., "Criando conta...").
+Replace the existing <button> in your form with this new <SubmitButton /> component.
+By following these steps, your registration form will securely send the user's data to the server, create an account, and provide clear feedback to the user, all without a full page reload.

@@ -1,3 +1,4 @@
-// Layout components will go here
-// Example: Header, Footer, Sidebar, etc.
-export {};
+// Layout components
+export { Header } from './header';
+export { Footer } from './footer';
+export { Sidebar } from './sidebar';
