@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Page() {
   return (
@@ -6,7 +6,10 @@ export default function Page() {
       {/* Container */}
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
         {/* Hero */}
-        <section aria-labelledby="hero-title" className="pb-20 sm:pb-28 border-b border-border">
+        <section
+          aria-labelledby="hero-title"
+          className="pb-20 sm:pb-28 border-b border-border"
+        >
           <div className="space-y-6">
             <h1
               id="hero-title"
@@ -15,7 +18,8 @@ export default function Page() {
               Portal do Aluno
             </h1>
             <p className="max-w-2xl text-base sm:text-lg text-accent leading-relaxed">
-              Gerencie faturas, assinaturas e notificações em um só lugar — com clareza, segurança e autonomia.
+              Gerencie faturas, assinaturas e notificações em um só lugar — com
+              clareza, segurança e autonomia.
             </p>
             <div className="flex items-center gap-6 pt-2">
               <Link
@@ -40,7 +44,10 @@ export default function Page() {
           className="py-20 sm:py-28 border-b border-border"
         >
           <div className="space-y-10">
-            <h2 id="como-comecar-title" className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            <h2
+              id="como-comecar-title"
+              className="text-2xl sm:text-3xl font-semibold tracking-tight"
+            >
               Como Começar
             </h2>
 
@@ -49,7 +56,8 @@ export default function Page() {
                 <div className="text-sm font-semibold text-accent">Passo 1</div>
                 <h3 className="text-lg font-medium">Crie sua conta</h3>
                 <p className="text-sm text-accent leading-relaxed">
-                  Cadastre-se com seu e-mail institucional para acessar o portal com segurança.
+                  Cadastre-se com seu e-mail institucional para acessar o portal
+                  com segurança.
                 </p>
               </li>
 
@@ -57,7 +65,8 @@ export default function Page() {
                 <div className="text-sm font-semibold text-accent">Passo 2</div>
                 <h3 className="text-lg font-medium">Ative sua assinatura</h3>
                 <p className="text-sm text-accent leading-relaxed">
-                  Escolha o plano e conclua o pagamento. Faturas ficam disponíveis no seu perfil.
+                  Escolha o plano e conclua o pagamento. Faturas ficam
+                  disponíveis no seu perfil.
                 </p>
               </li>
 
@@ -65,7 +74,8 @@ export default function Page() {
                 <div className="text-sm font-semibold text-accent">Passo 3</div>
                 <h3 className="text-lg font-medium">Habilite notificações</h3>
                 <p className="text-sm text-accent leading-relaxed">
-                  Receba lembretes sobre vencimentos, confirmações e atualizações importantes.
+                  Receba lembretes sobre vencimentos, confirmações e
+                  atualizações importantes.
                 </p>
               </li>
             </ol>
@@ -73,16 +83,23 @@ export default function Page() {
         </section>
 
         {/* Mensagem do professor */}
-        <section aria-labelledby="mensagem-prof-title" className="py-20 sm:py-28">
+        <section
+          aria-labelledby="mensagem-prof-title"
+          className="py-20 sm:py-28"
+        >
           <div className="max-w-3xl">
-            <h2 id="mensagem-prof-title" className="text-2xl sm:text-3xl font-semibold tracking-tight mb-8">
+            <h2
+              id="mensagem-prof-title"
+              className="text-2xl sm:text-3xl font-semibold tracking-tight mb-8"
+            >
               Uma mensagem do seu professor
             </h2>
 
             <blockquote className="space-y-6">
               <p className="text-lg sm:text-xl leading-relaxed">
-                “Criei este portal para centralizar tarefas administrativas — pagamentos, assinaturas e avisos —
-                para que possamos dedicar mais tempo ao que importa: ensinar e aprender, sem distrações.”
+                “Criei este portal para centralizar tarefas administrativas —
+                pagamentos, assinaturas e avisos — para que possamos dedicar
+                mais tempo ao que importa: ensinar e aprender, sem distrações.”
               </p>
               <footer className="pt-2">
                 <div className="h-px w-16 bg-border mb-4" />

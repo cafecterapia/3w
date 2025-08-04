@@ -1,45 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
+import { loginUser, LoginState } from './actions';
+import { useActionState } from '@/lib/useActionState';
 
 export default function LoginPage() {
+  const [state, formAction] = useActionState<LoginState>(loginUser, {});
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
   const router = useRouter();
 
-  async function handleSubmit(formData: FormData) {
-    setIsLoading(true);
-    setError('');
-
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    if (!email || !password) {
-      setError('Email e senha são obrigatórios.');
-      setIsLoading(false);
-      return;
+  // Handle successful credential verification
+  useEffect(() => {
+    if (state.message === 'login-success') {
+      handleNextAuthSignIn();
     }
+  }, [state.message]);
 
+  async function handleNextAuthSignIn() {
     try {
+      // Get the form data
+      const formData = new FormData(
+        document.querySelector('form') as HTMLFormElement
+      );
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Now use NextAuth to actually sign in
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
-      if (result?.error) {
-        setError('Email ou senha inválidos.');
-      } else {
-        router.push('/dashboard');
+      if (result?.ok) {
+        // Check the redirect cookie to determine where to go
+        const redirectType = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('pending-redirect='))
+          ?.split('=')[1];
+
+        // Clear the cookie
+        document.cookie = 'pending-redirect=; Max-Age=0; path=/';
+
+        if (redirectType === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (error) {
-      setError('Algo deu errado. Tente novamente.');
+      console.error('NextAuth sign in error:', error);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    setIsLoading(false);
+  async function handleSubmit(formData: FormData) {
+    setIsLoading(true);
+    await formAction(formData);
+    // Note: setIsLoading(false) will be called in handleNextAuthSignIn or if there's an error
+    if (state.message && state.message !== 'login-success') {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -52,9 +77,9 @@ export default function LoginPage() {
           <p className="mt-3 text-center text-accent">
             Acesse faturas, assinaturas e notificações com segurança.
           </p>
-          {error ? (
+          {state.message ? (
             <p role="alert" className="mt-4 text-center text-sm text-[crimson]">
-              {error}
+              {state.message}
             </p>
           ) : null}
         </header>
@@ -112,7 +137,10 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-accent">
             Não tem uma conta?{' '}
-            <Link href="/register" className="font-medium text-foreground hover:underline underline-offset-4">
+            <Link
+              href="/register"
+              className="font-medium text-foreground hover:underline underline-offset-4"
+            >
               Criar minha conta
             </Link>
           </p>

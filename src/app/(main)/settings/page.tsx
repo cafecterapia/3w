@@ -22,8 +22,12 @@ export default function SettingsPage() {
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Header */}
         <header className="mb-10 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Configurações da conta</h1>
-          <p className="mt-2 text-accent">Atualize seus dados, preferências e controle da assinatura.</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            Configurações da conta
+          </h1>
+          <p className="mt-2 text-accent">
+            Atualize seus dados, preferências e controle da assinatura.
+          </p>
         </header>
 
         {/* Two-column layout: primary settings + side actions */}
@@ -43,17 +47,30 @@ export default function SettingsPage() {
 
                 <Field>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" defaultValue={user.email} />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    defaultValue={user.email}
+                  />
                 </Field>
 
                 <Field className="sm:col-span-2">
                   <Label htmlFor="phone">Telefone</Label>
-                  <Input id="phone" name="phone" type="tel" placeholder="+55 (11) 90000-0000" defaultValue={user.phone} />
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="+55 (11) 90000-0000"
+                    defaultValue={user.phone}
+                  />
                 </Field>
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3">
-                <Button variant="ghost" type="reset">Descartar</Button>
+                <Button variant="ghost" type="reset">
+                  Descartar
+                </Button>
                 <Button type="submit">Salvar alterações</Button>
               </div>
             </Card>
@@ -67,16 +84,28 @@ export default function SettingsPage() {
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field>
                   <Label htmlFor="current-password">Senha atual</Label>
-                  <Input id="current-password" name="currentPassword" type="password" placeholder="••••••••" />
+                  <Input
+                    id="current-password"
+                    name="currentPassword"
+                    type="password"
+                    placeholder="••••••••"
+                  />
                 </Field>
                 <Field>
                   <Label htmlFor="new-password">Nova senha</Label>
-                  <Input id="new-password" name="newPassword" type="password" placeholder="Mínimo 8 caracteres" />
+                  <Input
+                    id="new-password"
+                    name="newPassword"
+                    type="password"
+                    placeholder="Mínimo 8 caracteres"
+                  />
                 </Field>
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3">
-                <Button variant="ghost" type="reset">Cancelar</Button>
+                <Button variant="ghost" type="reset">
+                  Cancelar
+                </Button>
                 <Button type="submit">Atualizar senha</Button>
               </div>
             </Card>
@@ -90,7 +119,11 @@ export default function SettingsPage() {
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field>
                   <Label htmlFor="language">Idioma</Label>
-                  <Select id="language" name="language" defaultValue={user.language}>
+                  <Select
+                    id="language"
+                    name="language"
+                    defaultValue={user.language}
+                  >
                     <option value="pt-BR">Português (Brasil)</option>
                     <option value="en-US">English (US)</option>
                     <option value="es-ES">Español</option>
@@ -98,7 +131,11 @@ export default function SettingsPage() {
                 </Field>
                 <Field>
                   <Label htmlFor="timezone">Fuso horário</Label>
-                  <Select id="timezone" name="timezone" defaultValue={user.timezone}>
+                  <Select
+                    id="timezone"
+                    name="timezone"
+                    defaultValue={user.timezone}
+                  >
                     <option value="America/Sao_Paulo">America/Sao_Paulo</option>
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">America/New_York</option>
@@ -122,7 +159,9 @@ export default function SettingsPage() {
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3">
-                <Button variant="ghost" type="reset">Descartar</Button>
+                <Button variant="ghost" type="reset">
+                  Descartar
+                </Button>
                 <Button type="submit">Salvar preferências</Button>
               </div>
             </Card>
@@ -161,7 +200,9 @@ export default function SettingsPage() {
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3">
-                <Button variant="ghost" type="reset">Cancelar</Button>
+                <Button variant="ghost" type="reset">
+                  Cancelar
+                </Button>
                 <Button type="submit">Salvar notificações</Button>
               </div>
             </Card>
@@ -175,9 +216,19 @@ export default function SettingsPage() {
                 description="Gerencie seu plano e pagamentos."
               />
               <div className="mt-4 grid grid-cols-1 gap-3">
-                <Button as={Link} href="/billing">Gerenciar assinatura</Button>
-                <Button as={Link} href="/billing/invoices" variant="secondary">Ver faturas</Button>
-                <Button as={Link} href="/billing/payment-methods" variant="ghost">Métodos de pagamento</Button>
+                <Button as={Link} href="/billing">
+                  Gerenciar assinatura
+                </Button>
+                <Button as={Link} href="/billing/invoices" variant="secondary">
+                  Ver faturas
+                </Button>
+                <Button
+                  as={Link}
+                  href="/billing/payment-methods"
+                  variant="ghost"
+                >
+                  Métodos de pagamento
+                </Button>
               </div>
             </Card>
 
@@ -187,9 +238,15 @@ export default function SettingsPage() {
                 description="Controle a visibilidade e os dados."
               />
               <div className="mt-4 grid grid-cols-1 gap-3">
-                <Button as="button" type="button" variant="secondary">Exportar dados</Button>
-                <Button as="button" type="button" variant="secondary">Baixar meus dados</Button>
-                <Button as="button" type="button" variant="ghost">Política de privacidade</Button>
+                <Button as="button" type="button" variant="secondary">
+                  Exportar dados
+                </Button>
+                <Button as="button" type="button" variant="secondary">
+                  Baixar meus dados
+                </Button>
+                <Button as="button" type="button" variant="ghost">
+                  Política de privacidade
+                </Button>
               </div>
             </Card>
 
@@ -199,12 +256,19 @@ export default function SettingsPage() {
                 description="Ações avançadas da conta."
               />
               <div className="mt-4 grid grid-cols-1 gap-3">
-                <Button as="button" type="button" variant="danger">Pausar assinatura</Button>
-                <Button as="button" type="button" variant="danger">Cancelar assinatura</Button>
-                <Button as="button" type="button" variant="danger-ghost">Excluir conta</Button>
+                <Button as="button" type="button" variant="danger">
+                  Pausar assinatura
+                </Button>
+                <Button as="button" type="button" variant="danger">
+                  Cancelar assinatura
+                </Button>
+                <Button as="button" type="button" variant="danger-ghost">
+                  Excluir conta
+                </Button>
               </div>
               <p className="mt-2 text-xs text-accent">
-                Estas ações podem ser irreversíveis. Confirme antes de continuar.
+                Estas ações podem ser irreversíveis. Confirme antes de
+                continuar.
               </p>
             </Card>
           </aside>
@@ -233,12 +297,20 @@ function CardHeader({
   return (
     <header>
       <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      {description ? <p className="mt-1 text-sm text-accent">{description}</p> : null}
+      {description ? (
+        <p className="mt-1 text-sm text-accent">{description}</p>
+      ) : null}
     </header>
   );
 }
 
-function Field({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function Field({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <div className={className}>{children}</div>;
 }
 
@@ -279,7 +351,9 @@ function ToggleRow({
     <div className="flex items-start justify-between gap-4 rounded-md border border-border bg-secondary p-3">
       <div>
         <p className="text-sm font-medium">{label}</p>
-        {description ? <p className="text-xs text-accent mt-1">{description}</p> : null}
+        {description ? (
+          <p className="text-xs text-accent mt-1">{description}</p>
+        ) : null}
       </div>
       <input
         id={id}
@@ -294,8 +368,14 @@ function ToggleRow({
 }
 
 type ButtonProps =
-  | (React.ButtonHTMLAttributes<HTMLButtonElement> & { as?: 'button'; href?: never })
-  | ({ as: typeof Link; href: string } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>)
+  | (React.ButtonHTMLAttributes<HTMLButtonElement> & {
+      as?: 'button';
+      href?: never;
+    })
+  | ({ as: typeof Link; href: string } & Omit<
+      React.AnchorHTMLAttributes<HTMLAnchorElement>,
+      'href'
+    >)
   | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { as?: 'a' });
 
 function Button({
@@ -304,7 +384,9 @@ function Button({
   children,
   variant = 'primary',
   ...rest
-}: ButtonProps & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-ghost' }) {
+}: ButtonProps & {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-ghost';
+}) {
   const base =
     'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30';
   const map: Record<string, string> = {
@@ -312,12 +394,17 @@ function Button({
     secondary: 'border border-border bg-secondary hover:bg-muted',
     ghost: 'text-foreground hover:underline underline-offset-4',
     danger: 'bg-foreground text-secondary hover:opacity-90', // consider semantic danger in theme if available
-    'danger-ghost': 'text-foreground/80 hover:text-foreground underline underline-offset-4',
+    'danger-ghost':
+      'text-foreground/80 hover:text-foreground underline underline-offset-4',
   };
 
   if (as === Link) {
     return (
-      <Link href={href!} {...(rest as any)} className={`${base} ${map[variant]}`}>
+      <Link
+        href={href!}
+        {...(rest as any)}
+        className={`${base} ${map[variant]}`}
+      >
         {children}
       </Link>
     );

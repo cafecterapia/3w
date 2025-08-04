@@ -7,7 +7,10 @@ import { useActionState } from '@/lib/useActionState';
 import type { RegisterState } from './actions';
 
 interface RegisterFormProps {
-  registerAction: (prevState: RegisterState, formData: FormData) => Promise<RegisterState>;
+  registerAction: (
+    prevState: RegisterState,
+    formData: FormData
+  ) => Promise<RegisterState>;
 }
 
 export default function RegisterForm({ registerAction }: RegisterFormProps) {
@@ -84,7 +87,9 @@ export default function RegisterForm({ registerAction }: RegisterFormProps) {
                 className="w-full rounded-md border border-border bg-secondary/50 px-4 py-3 text-base outline-none placeholder:text-accent focus:border-foreground focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
               />
               {state?.errors?.email ? (
-                <p className="text-xs text-[crimson]">{state.errors.email[0]}</p>
+                <p className="text-xs text-[crimson]">
+                  {state.errors.email[0]}
+                </p>
               ) : null}
             </div>
 
@@ -104,7 +109,9 @@ export default function RegisterForm({ registerAction }: RegisterFormProps) {
                 className="w-full rounded-md border border-border bg-secondary/50 px-4 py-3 text-base outline-none placeholder:text-accent focus:border-foreground focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
               />
               {state?.errors?.password ? (
-                <p className="text-xs text-[crimson]">{state.errors.password[0]}</p>
+                <p className="text-xs text-[crimson]">
+                  {state.errors.password[0]}
+                </p>
               ) : null}
             </div>
           </div>
@@ -114,14 +121,21 @@ export default function RegisterForm({ registerAction }: RegisterFormProps) {
             disabled={isPending || !!state?.success}
             className="inline-flex w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-secondary tracking-tight transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isPending ? 'Criando conta…' : state?.success ? 'Conta criada!' : 'Criar conta'}
+            {isPending
+              ? 'Criando conta…'
+              : state?.success
+                ? 'Conta criada!'
+                : 'Criar conta'}
           </button>
 
           <div className="h-px w-full bg-border" />
 
           <p className="text-center text-sm text-accent">
             Já tem uma conta?{' '}
-            <Link href="/login" className="font-medium text-foreground hover:underline underline-offset-4">
+            <Link
+              href="/login"
+              className="font-medium text-foreground hover:underline underline-offset-4"
+            >
               Faça login
             </Link>
           </p>
@@ -129,7 +143,8 @@ export default function RegisterForm({ registerAction }: RegisterFormProps) {
 
         <footer className="mt-16">
           <p className="text-center text-xs text-accent">
-            Ao continuar, você concorda com os termos e a política de privacidade.
+            Ao continuar, você concorda com os termos e a política de
+            privacidade.
           </p>
         </footer>
       </div>

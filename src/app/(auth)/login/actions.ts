@@ -1,7 +1,9 @@
 'use server';
 
-import { signIn } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
 
 export interface LoginState {
   message?: string;
@@ -21,19 +23,39 @@ export async function loginUser(
       };
     }
 
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
+    // Verify user credentials
+    const user = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (result?.error) {
+    if (!user || !user.password) {
       return {
         message: 'Email ou senha inválidos.',
       };
     }
 
-    redirect('/dashboard');
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return {
+        message: 'Email ou senha inválidos.',
+      };
+    }
+
+    // Store user info for client-side redirect
+    const cookieStore = await cookies();
+    cookieStore.set(
+      'pending-redirect',
+      (user as any)?.role === 'ADMIN' ? 'admin' : 'user',
+      {
+        httpOnly: false,
+        maxAge: 30, // 30 seconds
+        path: '/',
+      }
+    );
+
+    // Return success - the client will handle the actual NextAuth signIn
+    return { message: 'login-success' };
   } catch (error) {
     console.error('Login error:', error);
     return {

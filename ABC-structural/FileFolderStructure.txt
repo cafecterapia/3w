@@ -1,0 +1,184 @@
+3w/
+├── .env                    # Environment variables
+├── .env.example            # Environment variables template
+├── .env.local              # Local environment variables (API keys, database URL)
+├── .eslintrc.json          # ESLint configuration
+├── .gitignore              # Git ignore configuration
+├── .prettierignore         # Prettier ignore configuration
+├── .prettierrc.json        # Prettier configuration
+├── cypress.config.ts       # Cypress E2E testing configuration
+├── next.config.ts          # Next.js configuration (e.g., for PWA)
+├── next-env.d.ts           # Next.js TypeScript definitions
+├── package.json            # Project dependencies and scripts
+├── package-lock.json       # Package lock file
+├── postcss.config.js       # PostCSS configuration (for Tailwind)
+├── test-db.js              # Database testing script
+├── test-setup.ts           # Test setup configuration
+├── tsconfig.json           # TypeScript configuration
+├── tsconfig.tsbuildinfo    # TypeScript build info
+├── vitest.config.ts        # Vitest testing configuration
+
+├── .vscode/
+│   ├── settings.json       # VS Code workspace settings
+│   └── tasks.json          # VS Code tasks configuration
+
+├── ABC-structural/            # AI command documentation
+│   ├── Backend.txt
+│   ├── FileFolderStructure.txt
+│   └── register.txt
+
+├── cypress/                # End-to-end testing with Cypress
+│   ├── downloads/          # Downloaded files during tests (empty)
+│   ├── e2e/                # E2E test specifications
+│   │   ├── auth.cy.ts      # Authentication flow tests
+│   │   └── homepage.cy.ts  # Homepage tests
+│   ├── fixtures/           # Test data and mock files
+│   │   └── example.json
+│   ├── support/            # Cypress support files and custom commands
+│   │   ├── commands.ts     # Custom Cypress commands
+│   │   ├── component.ts    # Component testing setup
+│   │   ├── e2e.ts          # E2E testing setup
+│   │   └── index.d.ts      # TypeScript definitions for Cypress
+│   └── videos/             # Test execution videos
+│       └── auth.cy.ts.mp4  # Recorded test execution
+
+├── prisma/
+│   ├── schema.prisma       # Your database schema (models, relations)
+│   └── migrations/         # Database migration history
+│       ├── migration_lock.toml
+│       ├── 20250803021257_initial_setup/
+│       │   └── migration.sql
+│       ├── 20250803025932_add_password_field/
+│       │   └── migration.sql
+│       └── 20250804065656_add_user_role/
+│           └── migration.sql
+
+├── public/
+│   ├── icons/              # App icons for PWA (empty directory)
+│   ├── images/             # Static images like logos or marketing photos (empty directory)
+│   ├── manifest.json       # PWA manifest file
+│   └── sw.js               # Service Worker for push notifications & offline capabilities
+
+├── scripts/                # Utility scripts
+│   └── create-admin.ts     # Script to create admin users
+
+└── src/
+    ├── __tests__/          # Test files
+    │   ├── data.test.ts    # Data layer tests
+    │   └── components/     # Component tests
+    │       └── button.test.tsx # Button component tests
+    │
+    ├── app/
+    │   ├── (admin)/          # Route group for admin pages
+    │   │   ├── admin-header.tsx    # Admin header component
+    │   │   ├── admin-navigation.tsx # Admin navigation component
+    │   │   ├── layout.tsx    # Admin layout wrapper
+    │   │   └── admin/        # Admin dashboard and management pages
+    │   │       ├── page.tsx  # Main admin dashboard
+    │   │       ├── analytics/
+    │   │       │   ├── analytics-client.tsx # Client-side analytics component
+    │   │       │   └── page.tsx # Analytics dashboard page
+    │   │       ├── dashboard/
+    │   │       │   ├── dashboard-client.tsx # Client-side dashboard component
+    │   │       │   └── page.tsx # Admin dashboard page
+    │   │       ├── subscribers/
+    │   │       │   ├── page.tsx # Subscriber management page
+    │   │       │   └── subscribers-client.tsx # Client-side subscribers component
+    │   │       └── users/
+    │   │           ├── page.tsx # User management page
+    │   │           └── users-client.tsx # Client-side users component
+    │   │
+    │   ├── (auth)/           # Route group for authentication pages
+    │   │   ├── login/
+    │   │   │   ├── actions.ts
+    │   │   │   └── page.tsx
+    │   │   ├── register/
+    │   │   │   ├── actions.ts
+    │   │   │   ├── page.tsx
+    │   │   │   └── register-form.tsx
+    │   │   └── signout/
+    │   │       └── page.tsx
+    │   │
+    │   ├── (main)/           # Route group for protected, authenticated routes
+    │   │   ├── layout.tsx      # Shared layout for the main app (e.g., with sidebar)
+    │   │   ├── billing/
+    │   │   │   └── page.tsx    # Page to manage subscription, view invoices
+    │   │   ├── dashboard/
+    │   │   │   └── page.tsx    # Main dashboard after login
+    │   │   ├── profile/
+    │   │   │   └── page.tsx    # User profile page
+    │   │   ├── settings/
+    │   │   │   └── page.tsx    # User account settings
+    │   │   └── support/
+    │   │       └── page.tsx    # Support page
+    │   │
+    │   ├── api/                # API Routes (Your Backend-for-Frontend - BFF)
+    │   │   ├── admin/
+    │   │   │   └── route.ts    # Admin-related API endpoints
+    │   │   │
+    │   │   ├── auth/
+    │   │   │   └── [...nextauth]/
+    │   │   │       └── route.ts # Auth.js catch-all route
+    │   │   │
+    │   │   ├── debug/
+    │   │   │   └── db/
+    │   │   │       └── route.ts # Database debugging endpoint
+    │   │   │
+    │   │   ├── payments/
+    │   │   │   ├── create-subscription/
+    │   │   │   │   └── route.ts # Server-side logic to create a subscription with Efi
+    │   │   │   └── manage-subscription/
+    │   │   │       └── route.ts # Logic to create a portal link to manage billing
+    │   │   │
+    │   │   ├── push/
+    │   │   │   ├── send-notification/
+    │   │   │   │   └── route.ts # Secure endpoint to trigger a push notification
+    │   │   │   └── subscribe/
+    │   │   │       └── route.ts # Logic to save a user's push subscription
+    │   │   │
+    │   │   └── webhooks/
+    │   │       └── efi/
+    │   │           └── route.ts # Handles incoming webhooks from Efi (e.g., payment success)
+    │   │
+    │   ├── globals.css       # Global styles for Tailwind CSS
+    │   ├── layout.tsx        # Root layout of the entire application
+    │   └── page.tsx          # Your public landing/home page
+    │
+    ├── components/
+    │   ├── providers.tsx     # Context providers (auth, theme, etc.)
+    │   │
+    │   ├── ui/               # Reusable, generic UI components (Button, Card, Input, etc.)
+    │   │   ├── button.tsx
+    │   │   ├── card.tsx
+    │   │   └── index.ts
+    │   │
+    │   ├── features/         # Components for specific features
+    │   │   ├── billing-portal.tsx
+    │   │   ├── pricing-table.tsx
+    │   │   ├── push-notification-settings.tsx
+    │   │   └── subscription-status.tsx
+    │   │
+    │   └── layout/           # Major layout components
+    │       ├── footer.tsx
+    │       ├── header.tsx
+    │       ├── index.ts
+    │       ├── mobile-navigation.tsx
+    │       ├── profile-menu.tsx
+    │       └── sidebar.tsx
+    │
+    ├── hooks/
+    │   ├── use-push-manager.ts # Custom hook to manage PWA push notification logic
+    │   └── use-subscription.ts # Custom hook to get current user's subscription status
+    │
+    ├── lib/
+    │   ├── admin-utils.ts    # Admin-specific utility functions
+    │   ├── auth.ts           # Auth.js configuration and options
+    │   ├── data.ts           # Data access layer and utility functions
+    │   ├── efi.ts            # Efi SDK initialization and helper functions
+    │   ├── prisma.ts         # Prisma client instance (singleton for performance)
+    │   ├── useActionState.ts # Custom useActionState hook
+    │   └── utils.ts          # Utility functions (e.g., formatting dates, currency)
+    │
+    └── types/
+        ├── index.ts          # Global TypeScript types (e.g., for subscription plans)
+        └── next-auth.d.ts    # NextAuth type definitions

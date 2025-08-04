@@ -1,34 +1,45 @@
 // app/dashboard/page.tsx
+
 import { Metadata } from 'next';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { getDashboardData } from '@/lib/data'; // Import our new function
+import { format } from 'date-fns'; // A great library for date formatting
+import { ptBR } from 'date-fns/locale';
 
 export const metadata: Metadata = {
-  title: 'Dashboard — Portal do Aluno',
+  title: 'Painel — Portal do Aluno',
   description: 'Resumo da sua assinatura, faturas e avisos.',
 };
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session) redirect('/login');
+  // Ensure we have a user ID before proceeding
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
 
-  // Mocked data placeholders; replace with real data
+  // Fetch real data from the database in parallel
+  const { subscription, invoices, notices } = await getDashboardData(
+    session.user.id
+  );
+
   const userName = session.user?.name || session.user?.email || 'Aluno';
-  const subscription = {
-    status: 'active', // 'active' | 'trialing' | 'past_due' | 'canceled'
-    plan: 'Plano Premium',
-    nextBillingDate: '15 Mar 2025',
-    nextAmount: 'R$ 29,99',
+
+  // --- Helper functions for formatting data ---
+  const formatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined) return 'N/A';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(amount);
   };
-  const invoices = [
-    { id: 'inv_001', date: '15 Fev 2025', amount: 'R$ 29,99', status: 'Pago' },
-    { id: 'inv_000', date: '15 Jan 2025', amount: 'R$ 29,99', status: 'Pago' },
-  ];
-  const notices = [
-    { id: 'n1', text: 'Novo material disponível para a turma A2.', date: 'Hoje' },
-    { id: 'n2', text: 'Relembrando: ative as notificações por e-mail.', date: 'Ontem' },
-  ];
+
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return 'N/A';
+    return format(date, 'd MMM yyyy', { locale: ptBR });
+  };
 
   return (
     <main className="min-h-dvh bg-background text-foreground">
@@ -40,7 +51,8 @@ export default async function DashboardPage() {
               Olá, {userName}
             </h1>
             <p className="text-accent">
-              Aqui está um resumo rápido da sua assinatura e das últimas atualizações.
+              Aqui está um resumo rápido da sua assinatura e das últimas
+              atualizações.
             </p>
           </div>
         </header>
@@ -56,9 +68,12 @@ export default async function DashboardPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle>Assinatura</CardTitle>
-                  <p className="mt-1 text-sm text-accent">{subscription.plan}</p>
+                  <p className="mt-1 text-sm text-accent">
+                    {subscription?.plan || 'Nenhum plano ativo'}
+                  </p>
                 </div>
-                <StatusPill status={subscription.status} />
+                {/* We pass the status, or a default string if no subscription */}
+                <StatusPill status={subscription?.status || 'inactive'} />
               </div>
               <div className="mt-4">
                 <Link
@@ -76,11 +91,15 @@ export default async function DashboardPage() {
               <div className="mt-3 flex items-baseline justify-between">
                 <div>
                   <p className="text-sm text-accent">Data</p>
-                  <p className="text-base mt-1">{subscription.nextBillingDate}</p>
+                  <p className="text-base mt-1">
+                    {formatDate(subscription?.nextBillingDate)}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-accent">Valor</p>
-                  <p className="text-base mt-1">{subscription.nextAmount}</p>
+                  <p className="text-base mt-1">
+                    {formatCurrency(subscription?.nextAmount)}
+                  </p>
                 </div>
               </div>
               <div className="mt-4">
@@ -99,7 +118,9 @@ export default async function DashboardPage() {
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <QuickAction href="/billing">Ver faturas</QuickAction>
                 <QuickAction href="/settings">Notificações</QuickAction>
-                <QuickAction href="/settings#perfil">Atualizar perfil</QuickAction>
+                <QuickAction href="/settings#perfil">
+                  Atualizar perfil
+                </QuickAction>
                 <QuickAction href="/support">Suporte</QuickAction>
               </div>
             </Card>
@@ -107,7 +128,10 @@ export default async function DashboardPage() {
         </section>
 
         {/* Middle grid: Faturas recentes + Avisos */}
-        <section aria-labelledby="financeiro-e-avisos" className="mb-10 sm:mb-12">
+        <section
+          aria-labelledby="financeiro-e-avisos"
+          className="mb-10 sm:mb-12"
+        >
           <h2 id="financeiro-e-avisos" className="sr-only">
             Financeiro e avisos
           </h2>
@@ -124,35 +148,61 @@ export default async function DashboardPage() {
                 </Link>
               </div>
 
-              <ul className="mt-4 divide-y divide-border">
-                {invoices.map((inv) => (
-                  <li key={inv.id} className="flex items-center justify-between py-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{inv.date}</p>
-                      <p className="text-xs text-accent">ID: {inv.id}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm">{inv.amount}</span>
-                      <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs">
-                        {inv.status}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              {invoices.length > 0 ? (
+                <ul className="mt-4 divide-y divide-border">
+                  {invoices.map((inv: any) => (
+                    <li
+                      key={inv.id}
+                      className="flex items-center justify-between py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          {formatDate(inv.date)}
+                        </p>
+                        <p className="text-xs text-accent">
+                          ID: {inv.invoiceId}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm">
+                          {formatCurrency(inv.amount)}
+                        </span>
+                        <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs">
+                          {inv.status}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-accent">
+                  Nenhuma fatura encontrada.
+                </p>
+              )}
             </Card>
 
             {/* Avisos */}
             <Card>
               <CardTitle>Últimos avisos</CardTitle>
-              <ul className="mt-4 space-y-3">
-                {notices.map((n) => (
-                  <li key={n.id} className="rounded-md border border-border p-3">
-                    <p className="text-sm">{n.text}</p>
-                    <p className="mt-1 text-xs text-accent">{n.date}</p>
-                  </li>
-                ))}
-              </ul>
+              {notices.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {notices.map((n: any) => (
+                    <li
+                      key={n.id}
+                      className="rounded-md border border-border p-3"
+                    >
+                      <p className="text-sm">{n.text}</p>
+                      <p className="mt-1 text-xs text-accent">
+                        {formatDate(n.createdAt)}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-accent">
+                  Nenhum aviso recente.
+                </p>
+              )}
               <div className="mt-4">
                 <Link
                   href="/settings"
@@ -165,7 +215,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        {/* Bottom: Ajuda + Acessibilidade */}
+        {/* Bottom section (remains the same) */}
         <section aria-labelledby="suporte-acessibilidade">
           <h2 id="suporte-acessibilidade" className="sr-only">
             Suporte e acessibilidade
@@ -178,7 +228,9 @@ export default async function DashboardPage() {
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <QuickAction href="/support">Central de ajuda</QuickAction>
-                <QuickAction href="/support#contato">Falar com suporte</QuickAction>
+                <QuickAction href="/support#contato">
+                  Falar com suporte
+                </QuickAction>
                 <QuickAction href="/support#pagamentos">Pagamentos</QuickAction>
               </div>
             </Card>
@@ -198,7 +250,7 @@ export default async function DashboardPage() {
   );
 }
 
-/* UI primitives */
+/* UI primitives (Update StatusPill to handle more cases) */
 function Card({
   children,
   className = '',
@@ -216,33 +268,36 @@ function Card({
 }
 
 function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-base sm:text-lg font-semibold tracking-tight">{children}</h3>;
+  return (
+    <h3 className="text-base sm:text-lg font-semibold tracking-tight">
+      {children}
+    </h3>
+  );
 }
 
-function StatusPill({ status }: { status: 'active' | 'trialing' | 'past_due' | 'canceled' | string }) {
-  const label =
-    status === 'active'
-      ? 'Ativa'
-      : status === 'trialing'
-      ? 'Em avaliação'
-      : status === 'past_due'
-      ? 'Em atraso'
-      : status === 'canceled'
-      ? 'Cancelada'
-      : status;
-
-  const tone =
-    status === 'active'
-      ? 'bg-muted'
-      : status === 'trialing'
-      ? 'bg-muted'
-      : status === 'past_due'
-      ? 'bg-muted'
-      : 'bg-muted';
+function StatusPill({ status }: { status: string }) {
+  const statusInfo: { label: string; tone: string } = {
+    active: { label: 'Ativa', tone: 'bg-green-500/20 text-green-700' },
+    trialing: {
+      label: 'Em avaliação',
+      tone: 'bg-yellow-500/20 text-yellow-700',
+    },
+    past_due: { label: 'Em atraso', tone: 'bg-red-500/20 text-red-700' },
+    canceled: {
+      label: 'Cancelada',
+      tone: 'bg-muted-foreground/20 text-muted-foreground',
+    },
+    inactive: {
+      label: 'Inativa',
+      tone: 'bg-muted-foreground/20 text-muted-foreground',
+    },
+  }[status] || { label: 'Desconhecido', tone: 'bg-muted' };
 
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs ${tone}`}>
-      {label}
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${statusInfo.tone}`}
+    >
+      {statusInfo.label}
     </span>
   );
 }

@@ -9,7 +9,10 @@ export function MobileNavigation() {
 
   return (
     <div className="flex items-center gap-2 sm:hidden">
-      <Link href="/dashboard" className="px-3 py-2 text-sm font-semibold tracking-tight">
+      <Link
+        href="/dashboard"
+        className="px-3 py-2 text-sm font-semibold tracking-tight"
+      >
         Portal
       </Link>
       <div className="flex items-center gap-1">

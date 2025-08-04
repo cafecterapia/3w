@@ -19,9 +19,27 @@ export default function BillingPage() {
   };
 
   const history = [
-    { id: 'inv_003', month: 'Fevereiro 2025', plan: 'Premium', amount: 'R$ 29,99', status: 'Pago' },
-    { id: 'inv_002', month: 'Janeiro 2025', plan: 'Premium', amount: 'R$ 29,99', status: 'Pago' },
-    { id: 'inv_001', month: 'Dezembro 2024', plan: 'Premium', amount: 'R$ 29,99', status: 'Pago' },
+    {
+      id: 'inv_003',
+      month: 'Fevereiro 2025',
+      plan: 'Premium',
+      amount: 'R$ 29,99',
+      status: 'Pago',
+    },
+    {
+      id: 'inv_002',
+      month: 'Janeiro 2025',
+      plan: 'Premium',
+      amount: 'R$ 29,99',
+      status: 'Pago',
+    },
+    {
+      id: 'inv_001',
+      month: 'Dezembro 2024',
+      plan: 'Premium',
+      amount: 'R$ 29,99',
+      status: 'Pago',
+    },
   ];
 
   return (
@@ -43,7 +61,9 @@ export default function BillingPage() {
           <section className="lg:col-span-2 rounded-lg border border-border bg-secondary/50 p-5 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <h2 className="text-lg font-semibold tracking-tight">Plano atual</h2>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Plano atual
+                </h2>
                 <p className="mt-1 text-sm text-accent">{plan.description}</p>
               </div>
               <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs">
@@ -67,16 +87,21 @@ export default function BillingPage() {
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <ActionButton href="/billing/manage">Gerenciar assinatura</ActionButton>
+              <ActionButton href="/billing/manage">
+                Gerenciar assinatura
+              </ActionButton>
               <ActionButton href="/billing/invoices" variant="secondary">
                 Ver faturas
               </ActionButton>
             </div>
 
             <div className="mt-8">
-              <h3 className="text-sm font-semibold tracking-tight">Formas de pagamento</h3>
+              <h3 className="text-sm font-semibold tracking-tight">
+                Formas de pagamento
+              </h3>
               <p className="mt-2 text-sm text-accent">
-                Atualize seu cartão ou adicione métodos alternativos com segurança.
+                Atualize seu cartão ou adicione métodos alternativos com
+                segurança.
               </p>
               <div className="mt-4">
                 <ActionButton href="/billing/payment-methods" variant="ghost">
@@ -114,7 +139,9 @@ export default function BillingPage() {
         {/* Histórico de faturas */}
         <section className="mt-10 sm:mt-12">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight">Histórico de faturas</h2>
+            <h2 className="text-lg font-semibold tracking-tight">
+              Histórico de faturas
+            </h2>
             <Link
               href="/billing/invoices"
               className="text-sm text-accent hover:underline underline-offset-4"
@@ -180,8 +207,8 @@ function ActionButton({
     variant === 'primary'
       ? 'bg-primary text-secondary hover:opacity-90'
       : variant === 'secondary'
-      ? 'border border-border bg-secondary hover:bg-muted'
-      : 'text-foreground hover:underline underline-offset-4';
+        ? 'border border-border bg-secondary hover:bg-muted'
+        : 'text-foreground hover:underline underline-offset-4';
   return (
     <Link href={href} className={`${base} ${styles}`}>
       {children}
@@ -197,7 +224,10 @@ function Th({
   className?: string;
 }) {
   return (
-    <th scope="col" className={`px-4 py-3 text-xs font-medium text-accent ${className}`}>
+    <th
+      scope="col"
+      className={`px-4 py-3 text-xs font-medium text-accent ${className}`}
+    >
       {children}
     </th>
   );

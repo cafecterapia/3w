@@ -12,9 +12,9 @@ export default function SignOutPage() {
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
-      await signOut({ 
+      await signOut({
         redirect: false,
-        callbackUrl: '/login'
+        callbackUrl: '/login',
       });
       // Redirect after successful signout
       router.push('/login');
@@ -61,7 +61,10 @@ export default function SignOutPage() {
         <div className="mt-8 text-center">
           <p className="text-sm text-accent">
             Ou volte para{' '}
-            <Link href="/dashboard" className="font-medium text-foreground hover:underline underline-offset-4">
+            <Link
+              href="/dashboard"
+              className="font-medium text-foreground hover:underline underline-offset-4"
+            >
               Dashboard
             </Link>
           </p>

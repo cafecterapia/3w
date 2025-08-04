@@ -7,7 +7,7 @@ async function testDatabase() {
 
   try {
     console.log('🔍 Testing database connection...');
-    
+
     // Test connection
     await prisma.$connect();
     console.log('✅ Database connected successfully');
@@ -35,7 +35,6 @@ async function testDatabase() {
       where: { id: newUser.id },
     });
     console.log('✅ Test user deleted');
-
   } catch (error) {
     console.error('❌ Database test failed:', error);
   } finally {

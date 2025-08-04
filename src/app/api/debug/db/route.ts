@@ -5,7 +5,7 @@ export async function GET() {
   try {
     console.log('🔍 Testing database connection from Next.js API...');
     console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
-    
+
     // Test connection
     await prisma.$connect();
     console.log('✅ Database connected successfully');
@@ -26,16 +26,18 @@ export async function GET() {
       message: 'Database connection working',
       userCount,
       testUser: user,
-      databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Not set'
+      databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Not set',
     });
-
   } catch (error) {
     console.error('❌ Database test failed:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      },
+      { status: 500 }
+    );
   } finally {
     await prisma.$disconnect();
   }

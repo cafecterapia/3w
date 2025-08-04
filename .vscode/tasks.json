@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Update File Structure",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "echo '3w/' > 'ABC-structural/FileFolderStructure.txt' && find . -type f \\( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.json' -o -name '*.css' -o -name '*.md' -o -name '*.txt' -o -name '*.prisma' -o -name '*.sql' -o -name '*.toml' \\) | grep -v node_modules | grep -v .git | grep -v .next | sort | sed 's|^\\./||' | awk 'BEGIN{print \"# Generated on $(date)\"} {if(index($0,\"/\")){dir=substr($0,1,index($0,\"/\")-1); if(dir!=lastdir){print \"├── \" dir \"/\"; lastdir=dir}} print \"│   ├── \" $0}' >> 'ABC-structural/FileFolderStructure.txt'"
+      ],
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    }
+  ]
+}
