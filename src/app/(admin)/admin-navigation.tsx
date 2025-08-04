@@ -20,6 +20,8 @@ export default function AdminNavigation() {
     { href: '/admin/dashboard', label: 'Dashboard' },
     { href: '/admin/users', label: 'Users' },
     { href: '/admin/subscribers', label: 'Subscribers' },
+    { href: '/admin/payments', label: 'Payments' },
+    { href: '/admin/test-efi', label: 'Test EFI' },
     { href: '/admin/analytics', label: 'Analytics' },
   ];
 

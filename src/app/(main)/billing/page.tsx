@@ -88,7 +88,7 @@ export default function BillingPage() {
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <ActionButton href="/billing/manage">
-                Gerenciar assinatura
+                Gerenciar pagamentos
               </ActionButton>
               <ActionButton href="/billing/invoices" variant="secondary">
                 Ver faturas
@@ -104,7 +104,7 @@ export default function BillingPage() {
                 segurança.
               </p>
               <div className="mt-4">
-                <ActionButton href="/billing/payment-methods" variant="ghost">
+                <ActionButton href="/billing/manage" variant="ghost">
                   Gerenciar métodos de pagamento
                 </ActionButton>
               </div>

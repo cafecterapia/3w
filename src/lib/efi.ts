@@ -1,5 +1,6 @@
 // Efi SDK initialization and helper functions
 import EfiPay from 'sdk-node-apis-efi';
+import crypto from 'crypto';
 
 const options = {
   client_id: process.env.EFI_CLIENT_ID!,
@@ -14,6 +15,9 @@ export interface EfiSubscriptionParams {
   planId: string;
   amount: number;
   description?: string;
+  customerName: string;
+  customerEmail: string;
+  customerCpf: string;
 }
 
 export interface EfiSubscriptionResponse {
@@ -50,9 +54,9 @@ export class EfiService {
               .toISOString()
               .split('T')[0], // 7 days from now
             customer: {
-              name: 'Customer Name',
-              cpf: '00000000000',
-              email: 'customer@example.com',
+              name: params.customerName,
+              cpf: params.customerCpf,
+              email: params.customerEmail,
             },
           },
         },
@@ -101,10 +105,56 @@ export class EfiService {
     }
   }
 
+  async testConnection() {
+    try {
+      // Test connection by getting account balance or basic info
+      // This is a simple test that doesn't create any charges
+      const response = await this.client.getAccountBalance();
+      return {
+        connected: true,
+        environment: process.env.EFI_ENVIRONMENT,
+        balance: response.saldo,
+        status: 'Active'
+      };
+    } catch (error) {
+      console.error('EFI connection test error:', error);
+      throw new Error(`EFI connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
   verifyWebhookSignature(payload: string, signature: string): boolean {
-    // EFI webhook signature verification
-    // This is a placeholder - implement according to EFI documentation
-    return true;
+    try {
+      // EFI webhook signature verification using HMAC-SHA256
+      
+      // Get the webhook secret from environment variables
+      const webhookSecret = process.env.EFI_WEBHOOK_SECRET;
+      if (!webhookSecret) {
+        console.error('EFI_WEBHOOK_SECRET environment variable is not set');
+        return false;
+      }
+
+      // Create HMAC signature using the payload and webhook secret
+      const expectedSignature = crypto
+        .createHmac('sha256', webhookSecret)
+        .update(payload, 'utf8')
+        .digest('hex');
+
+      // Compare the signatures using a constant-time comparison to prevent timing attacks
+      const receivedSignature = signature.replace('sha256=', '');
+      
+      // Use timingSafeEqual for secure comparison
+      const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+      const receivedBuffer = Buffer.from(receivedSignature, 'hex');
+      
+      if (expectedBuffer.length !== receivedBuffer.length) {
+        return false;
+      }
+      
+      return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+    } catch (error) {
+      console.error('Error verifying webhook signature:', error);
+      return false;
+    }
   }
 }
 

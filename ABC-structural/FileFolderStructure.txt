@@ -50,7 +50,9 @@
 │       │   └── migration.sql
 │       ├── 20250803025932_add_password_field/
 │       │   └── migration.sql
-│       └── 20250804065656_add_user_role/
+│       ├── 20250804065656_add_user_role/
+│       │   └── migration.sql
+│       └── 20250804100258_add_cpf_field/
 │           └── migration.sql
 
 ├── public/
@@ -81,11 +83,16 @@
     │   │       ├── dashboard/
     │   │       │   ├── dashboard-client.tsx # Client-side dashboard component
     │   │       │   └── page.tsx # Admin dashboard page
+    │   │       ├── payments/
+    │   │       │   └── page.tsx # Payment management page
     │   │       ├── subscribers/
     │   │       │   ├── page.tsx # Subscriber management page
     │   │       │   └── subscribers-client.tsx # Client-side subscribers component
+    │   │       ├── test-efi/
+    │   │       │   └── page.tsx # EFI connection testing page
     │   │       └── users/
     │   │           ├── page.tsx # User management page
+    │   │           └── users-client.tsx # Client-side users component
     │   │           └── users-client.tsx # Client-side users component
     │   │
     │   ├── (auth)/           # Route group for authentication pages
@@ -102,7 +109,11 @@
     │   ├── (main)/           # Route group for protected, authenticated routes
     │   │   ├── layout.tsx      # Shared layout for the main app (e.g., with sidebar)
     │   │   ├── billing/
-    │   │   │   └── page.tsx    # Page to manage subscription, view invoices
+    │   │   │   ├── page.tsx    # Page to manage subscription, view invoices
+    │   │   │   └── manage/
+    │   │   │       ├── page.tsx # Payment management page
+    │   │   │       ├── payment-management-content.tsx # Client-side payment management content
+    │   │   │       └── payment-management-provider.tsx # Payment management provider
     │   │   ├── dashboard/
     │   │   │   └── page.tsx    # Main dashboard after login
     │   │   ├── profile/
@@ -114,7 +125,11 @@
     │   │
     │   ├── api/                # API Routes (Your Backend-for-Frontend - BFF)
     │   │   ├── admin/
-    │   │   │   └── route.ts    # Admin-related API endpoints
+    │   │   │   ├── route.ts    # Admin-related API endpoints
+    │   │   │   ├── test-efi-connection/
+    │   │   │   │   └── route.ts # EFI connection testing endpoint
+    │   │   │   └── test-subscription/
+    │   │   │       └── route.ts # Subscription testing endpoint
     │   │   │
     │   │   ├── auth/
     │   │   │   └── [...nextauth]/
@@ -125,10 +140,14 @@
     │   │   │       └── route.ts # Database debugging endpoint
     │   │   │
     │   │   ├── payments/
+    │   │   │   ├── billing-settings/
+    │   │   │   │   └── route.ts # Billing settings management
     │   │   │   ├── create-subscription/
     │   │   │   │   └── route.ts # Server-side logic to create a subscription with Efi
-    │   │   │   └── manage-subscription/
-    │   │   │       └── route.ts # Logic to create a portal link to manage billing
+    │   │   │   ├── manage-subscription/
+    │   │   │   │   └── route.ts # Logic to create a portal link to manage billing
+    │   │   │   └── payment-methods/
+    │   │   │       └── route.ts # Payment methods management
     │   │   │
     │   │   ├── push/
     │   │   │   ├── send-notification/
@@ -147,6 +166,9 @@
     ├── components/
     │   ├── providers.tsx     # Context providers (auth, theme, etc.)
     │   │
+    │   ├── admin/            # Admin-specific components
+    │   │   └── payment-settings-form.tsx # Payment settings form component
+    │   │
     │   ├── ui/               # Reusable, generic UI components (Button, Card, Input, etc.)
     │   │   ├── button.tsx
     │   │   ├── card.tsx
@@ -159,6 +181,7 @@
     │   │   └── subscription-status.tsx
     │   │
     │   └── layout/           # Major layout components
+    │       ├── admin-navigation.tsx
     │       ├── footer.tsx
     │       ├── header.tsx
     │       ├── index.ts

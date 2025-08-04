@@ -18,14 +18,23 @@ export function BillingPortal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ 
+          userId,
+          action: 'create_portal_session'
+        }),
       });
 
       const data = await response.json();
 
       if (data.success && data.portalUrl) {
-        // Redirect to the billing portal
-        window.location.href = data.portalUrl;
+        // Navigate to the billing management page
+        if (data.portalUrl.startsWith('/')) {
+          // Internal route
+          window.location.href = data.portalUrl;
+        } else {
+          // External URL
+          window.open(data.portalUrl, '_blank');
+        }
       } else {
         throw new Error(data.error || 'Failed to create billing portal');
       }

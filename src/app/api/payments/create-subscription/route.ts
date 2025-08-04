@@ -21,12 +21,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create subscription via EFI
+    // Fetch complete user details from database
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // For now, we'll use a default CPF until user profile is completed
+    // In production, you should require users to complete their profile
+    const defaultCpf = '00000000000';
+
+    // Validate required user information for Efí
+    if (!user.name || !user.email) {
+      return NextResponse.json(
+        { 
+          error: 'Missing required user information. Please complete your profile with name and email.' 
+        },
+        { status: 400 }
+      );
+    }
+
+    // Create subscription via EFI with real user data
     const subscription = await efiService.createSubscription({
       customerId: session.user.id,
       planId,
       amount: amount * 100, // Convert to cents
       description,
+      customerName: user.name,
+      customerEmail: user.email,
+      customerCpf: defaultCpf, // TODO: Replace with user.cpf when profile system is implemented
     });
 
     // Update user record with EFI subscription ID

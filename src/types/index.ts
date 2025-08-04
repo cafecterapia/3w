@@ -141,3 +141,30 @@ export interface EfiWebhookEvent extends WebhookEvent {
     status?: string;
   };
 }
+
+// Class-based plan types for new marketing flow
+export interface ClassPlan {
+  id: string;
+  classCount: number;
+  pricePerClass: number;
+  totalPrice: number;
+  discountPercentage?: number;
+  isPopular?: boolean;
+  features: string[];
+  expirationDays: number;
+}
+
+export interface SchedulingOption {
+  id: 'recurring' | 'on-demand';
+  name: string;
+  description: string;
+  icon: string;
+  benefits: string[];
+}
+
+export interface PlanSelection {
+  classCount: number;
+  schedulingOption: 'recurring' | 'on-demand';
+  totalPrice: number;
+  discountApplied: number;
+}

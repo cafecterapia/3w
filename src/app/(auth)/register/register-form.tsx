@@ -11,20 +11,33 @@ interface RegisterFormProps {
     prevState: RegisterState,
     formData: FormData
   ) => Promise<RegisterState>;
+  planDetails?: {
+    classCount: number;
+    schedulingOption: 'recurring' | 'on-demand';
+    totalPrice: number;
+  } | null;
 }
 
-export default function RegisterForm({ registerAction }: RegisterFormProps) {
+export default function RegisterForm({ registerAction, planDetails }: RegisterFormProps) {
   const [state, formAction, isPending] = useActionState(registerAction, {});
   const router = useRouter();
 
   useEffect(() => {
     if (state?.success) {
       const timer = setTimeout(() => {
-        router.push('/login');
+        if (planDetails) {
+          // If user registered with a plan selection, redirect to payment
+          const paymentUrl = `/api/payments/create-class-subscription`;
+          // In a real implementation, you would handle the payment flow here
+          // For now, redirect to login with plan info
+          router.push(`/login?plan=${planDetails.classCount}&scheduling=${planDetails.schedulingOption}&price=${planDetails.totalPrice}`);
+        } else {
+          router.push('/login');
+        }
       }, 1400);
       return () => clearTimeout(timer);
     }
-  }, [state?.success, router]);
+  }, [state?.success, router, planDetails]);
 
   return (
     <main className="min-h-dvh bg-background text-foreground">

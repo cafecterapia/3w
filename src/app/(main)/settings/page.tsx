@@ -216,15 +216,15 @@ export default function SettingsPage() {
                 description="Gerencie seu plano e pagamentos."
               />
               <div className="mt-4 grid grid-cols-1 gap-3">
-                <Button as={Link} href="/billing">
-                  Gerenciar assinatura
+                <Button as={Link} href="/billing/manage">
+                  Gerenciar pagamentos
                 </Button>
                 <Button as={Link} href="/billing/invoices" variant="secondary">
                   Ver faturas
                 </Button>
                 <Button
                   as={Link}
-                  href="/billing/payment-methods"
+                  href="/billing/manage"
                   variant="ghost"
                 >
                   Métodos de pagamento
