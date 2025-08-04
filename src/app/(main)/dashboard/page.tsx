@@ -1,63 +1,265 @@
+// app/dashboard/page.tsx
 import { Metadata } from 'next';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Dashboard - 3W App',
-  description: 'Your subscription dashboard',
+  title: 'Dashboard — Portal do Aluno',
+  description: 'Resumo da sua assinatura, faturas e avisos.',
 };
 
 export default async function DashboardPage() {
   const session = await auth();
+  if (!session) redirect('/login');
 
-  if (!session) {
-    redirect('/login');
-  }
+  // Mocked data placeholders; replace with real data
+  const userName = session.user?.name || session.user?.email || 'Aluno';
+  const subscription = {
+    status: 'active', // 'active' | 'trialing' | 'past_due' | 'canceled'
+    plan: 'Plano Premium',
+    nextBillingDate: '15 Mar 2025',
+    nextAmount: 'R$ 29,99',
+  };
+  const invoices = [
+    { id: 'inv_001', date: '15 Fev 2025', amount: 'R$ 29,99', status: 'Pago' },
+    { id: 'inv_000', date: '15 Jan 2025', amount: 'R$ 29,99', status: 'Pago' },
+  ];
+  const notices = [
+    { id: 'n1', text: 'Novo material disponível para a turma A2.', date: 'Hoje' },
+    { id: 'n2', text: 'Relembrando: ative as notificações por e-mail.', date: 'Ontem' },
+  ];
 
   return (
-    <div className="px-4 py-6 sm:px-0">
-      <div className="border-4 border-dashed border-gray-200 rounded-lg p-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Welcome to your Dashboard, {session.user?.name || 'User'}
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Manage your subscription and account settings from here.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Subscription Status
-              </h3>
-              <p className="text-sm text-gray-600">Active Premium Plan</p>
-              <div className="mt-4">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Active
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Next Billing
-              </h3>
-              <p className="text-sm text-gray-600">March 15, 2025</p>
-              <p className="text-lg font-semibold text-gray-900 mt-2">$29.99</p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Usage This Month
-              </h3>
-              <p className="text-sm text-gray-600">API Calls</p>
-              <p className="text-lg font-semibold text-gray-900 mt-2">
-                2,847 / 10,000
-              </p>
-            </div>
+    <main className="min-h-dvh bg-background text-foreground">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        {/* Page header */}
+        <header className="mb-10 sm:mb-12">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+              Olá, {userName}
+            </h1>
+            <p className="text-accent">
+              Aqui está um resumo rápido da sua assinatura e das últimas atualizações.
+            </p>
           </div>
-        </div>
+        </header>
+
+        {/* Top grid: Status + Próximo pagamento + Ações rápidas */}
+        <section aria-labelledby="resumo-assinatura" className="mb-10 sm:mb-12">
+          <h2 id="resumo-assinatura" className="sr-only">
+            Resumo da assinatura
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
+            {/* Status */}
+            <Card>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle>Assinatura</CardTitle>
+                  <p className="mt-1 text-sm text-accent">{subscription.plan}</p>
+                </div>
+                <StatusPill status={subscription.status} />
+              </div>
+              <div className="mt-4">
+                <Link
+                  href="/billing"
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                >
+                  Gerenciar assinatura
+                </Link>
+              </div>
+            </Card>
+
+            {/* Próximo faturamento */}
+            <Card>
+              <CardTitle>Próximo pagamento</CardTitle>
+              <div className="mt-3 flex items-baseline justify-between">
+                <div>
+                  <p className="text-sm text-accent">Data</p>
+                  <p className="text-base mt-1">{subscription.nextBillingDate}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-accent">Valor</p>
+                  <p className="text-base mt-1">{subscription.nextAmount}</p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Link
+                  href="/billing"
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                >
+                  Ver opções de pagamento
+                </Link>
+              </div>
+            </Card>
+
+            {/* Ações rápidas */}
+            <Card>
+              <CardTitle>Ações rápidas</CardTitle>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <QuickAction href="/billing">Ver faturas</QuickAction>
+                <QuickAction href="/settings">Notificações</QuickAction>
+                <QuickAction href="/settings#perfil">Atualizar perfil</QuickAction>
+                <QuickAction href="/support">Suporte</QuickAction>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* Middle grid: Faturas recentes + Avisos */}
+        <section aria-labelledby="financeiro-e-avisos" className="mb-10 sm:mb-12">
+          <h2 id="financeiro-e-avisos" className="sr-only">
+            Financeiro e avisos
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
+            {/* Faturas recentes */}
+            <Card className="md:col-span-2">
+              <div className="flex items-center justify-between">
+                <CardTitle>Faturas recentes</CardTitle>
+                <Link
+                  href="/billing"
+                  className="text-sm text-accent hover:underline underline-offset-4"
+                >
+                  Ver todas
+                </Link>
+              </div>
+
+              <ul className="mt-4 divide-y divide-border">
+                {invoices.map((inv) => (
+                  <li key={inv.id} className="flex items-center justify-between py-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{inv.date}</p>
+                      <p className="text-xs text-accent">ID: {inv.id}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm">{inv.amount}</span>
+                      <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs">
+                        {inv.status}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            {/* Avisos */}
+            <Card>
+              <CardTitle>Últimos avisos</CardTitle>
+              <ul className="mt-4 space-y-3">
+                {notices.map((n) => (
+                  <li key={n.id} className="rounded-md border border-border p-3">
+                    <p className="text-sm">{n.text}</p>
+                    <p className="mt-1 text-xs text-accent">{n.date}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4">
+                <Link
+                  href="/settings"
+                  className="text-sm text-accent hover:underline underline-offset-4"
+                >
+                  Gerenciar notificações
+                </Link>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* Bottom: Ajuda + Acessibilidade */}
+        <section aria-labelledby="suporte-acessibilidade">
+          <h2 id="suporte-acessibilidade" className="sr-only">
+            Suporte e acessibilidade
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3">
+            <Card className="md:col-span-2">
+              <CardTitle>Precisa de ajuda?</CardTitle>
+              <p className="mt-2 text-sm text-accent">
+                Encontre respostas rápidas ou fale diretamente com a equipe.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <QuickAction href="/support">Central de ajuda</QuickAction>
+                <QuickAction href="/support#contato">Falar com suporte</QuickAction>
+                <QuickAction href="/support#pagamentos">Pagamentos</QuickAction>
+              </div>
+            </Card>
+
+            <Card>
+              <CardTitle>Acessibilidade</CardTitle>
+              <ul className="mt-3 space-y-2 text-sm text-accent">
+                <li>Navegação por teclado suportada</li>
+                <li>Contraste otimizado para leitura</li>
+                <li>Rótulos e regiões ARIA</li>
+              </ul>
+            </Card>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
+  );
+}
+
+/* UI primitives */
+function Card({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={`rounded-lg border border-border bg-secondary/50 p-4 sm:p-5 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
+function CardTitle({ children }: { children: React.ReactNode }) {
+  return <h3 className="text-base sm:text-lg font-semibold tracking-tight">{children}</h3>;
+}
+
+function StatusPill({ status }: { status: 'active' | 'trialing' | 'past_due' | 'canceled' | string }) {
+  const label =
+    status === 'active'
+      ? 'Ativa'
+      : status === 'trialing'
+      ? 'Em avaliação'
+      : status === 'past_due'
+      ? 'Em atraso'
+      : status === 'canceled'
+      ? 'Cancelada'
+      : status;
+
+  const tone =
+    status === 'active'
+      ? 'bg-muted'
+      : status === 'trialing'
+      ? 'bg-muted'
+      : status === 'past_due'
+      ? 'bg-muted'
+      : 'bg-muted';
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs ${tone}`}>
+      {label}
+    </span>
+  );
+}
+
+function QuickAction({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center justify-center rounded-md border border-border bg-secondary px-3 py-2 text-sm hover:bg-muted"
+    >
+      {children}
+    </Link>
   );
 }

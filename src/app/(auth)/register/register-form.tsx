@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useActionState } from '@/lib/useActionState';
 import type { RegisterState } from './actions';
 
@@ -15,110 +15,124 @@ export default function RegisterForm({ registerAction }: RegisterFormProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (state.success) {
+    if (state?.success) {
       const timer = setTimeout(() => {
         router.push('/login');
-      }, 1500);
+      }, 1400);
       return () => clearTimeout(timer);
     }
-  }, [state.success, router]);
+  }, [state?.success, router]);
 
   return (
-    <>
-      {state?.message && (
-        <p
-          className={`mt-2 text-center text-sm ${
-            state.success ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {state.message}
-        </p>
-      )}
-      <form action={formAction} className="mt-8 space-y-6">
-        {/* ... the rest of your form remains exactly the same ... */}
-        <div className="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label htmlFor="name" className="sr-only">
-              Nome completo
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              required
-              disabled={isPending || state.success}
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Nome completo"
-            />
-            {state?.errors?.name && (
-              <p className="text-red-500 text-xs mt-1">
-                {state.errors.name[0]}
-              </p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="email-address" className="sr-only">
-              Endereço de e-mail
-            </label>
-            <input
-              id="email-address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              disabled={isPending || state.success}
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Email"
-            />
-            {state?.errors?.email && (
-              <p className="text-red-500 text-xs mt-1">
-                {state.errors.email[0]}
-              </p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Senha
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              disabled={isPending || state.success}
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Senha"
-            />
-            {state?.errors?.password && (
-              <p className="text-red-500 text-xs mt-1">
-                {state.errors.password[0]}
-              </p>
-            )}
-          </div>
-        </div>
+    <main className="min-h-dvh bg-background text-foreground">
+      <div className="mx-auto w-full max-w-md px-6 py-16 sm:py-24">
+        <header className="mb-10 text-center">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            Crie sua conta
+          </h1>
+          <p className="mt-3 text-accent">
+            Acesse o Portal do Aluno e gerencie tudo em um só lugar.
+          </p>
+        </header>
 
-        <div>
+        {state?.message ? (
+          <p
+            role="status"
+            className={`mb-6 text-center text-sm ${
+              state.success ? 'text-[green]' : 'text-[crimson]'
+            }`}
+          >
+            {state.message}
+          </p>
+        ) : null}
+
+        <form action={formAction} className="space-y-6">
+          <div className="space-y-4">
+            {/* Nome */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium">
+                Nome completo
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                disabled={isPending || !!state?.success}
+                placeholder="Seu nome e sobrenome"
+                className="w-full rounded-md border border-border bg-secondary/50 px-4 py-3 text-base outline-none placeholder:text-accent focus:border-foreground focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+              {state?.errors?.name ? (
+                <p className="text-xs text-[crimson]">{state.errors.name[0]}</p>
+              ) : null}
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                disabled={isPending || !!state?.success}
+                placeholder="nome@institucional.com"
+                className="w-full rounded-md border border-border bg-secondary/50 px-4 py-3 text-base outline-none placeholder:text-accent focus:border-foreground focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+              {state?.errors?.email ? (
+                <p className="text-xs text-[crimson]">{state.errors.email[0]}</p>
+              ) : null}
+            </div>
+
+            {/* Senha */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">
+                Senha
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                disabled={isPending || !!state?.success}
+                placeholder="Mínimo de 8 caracteres"
+                className="w-full rounded-md border border-border bg-secondary/50 px-4 py-3 text-base outline-none placeholder:text-accent focus:border-foreground focus:ring-0 disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+              {state?.errors?.password ? (
+                <p className="text-xs text-[crimson]">{state.errors.password[0]}</p>
+              ) : null}
+            </div>
+          </div>
+
           <button
             type="submit"
-            disabled={isPending || state.success}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed"
+            disabled={isPending || !!state?.success}
+            className="inline-flex w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-secondary tracking-tight transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isPending
-              ? 'Criando conta...'
-              : state.success
-                ? 'Conta criada!'
-                : 'Criar conta'}
+            {isPending ? 'Criando conta…' : state?.success ? 'Conta criada!' : 'Criar conta'}
           </button>
-        </div>
 
-        <div className="text-center">
-          <a href="/login" className="text-foreground hover:text-indigo-500">
-            Já tem uma conta? Faça login
-          </a>
-        </div>
-      </form>
-    </>
+          <div className="h-px w-full bg-border" />
+
+          <p className="text-center text-sm text-accent">
+            Já tem uma conta?{' '}
+            <Link href="/login" className="font-medium text-foreground hover:underline underline-offset-4">
+              Faça login
+            </Link>
+          </p>
+        </form>
+
+        <footer className="mt-16">
+          <p className="text-center text-xs text-accent">
+            Ao continuar, você concorda com os termos e a política de privacidade.
+          </p>
+        </footer>
+      </div>
+    </main>
   );
 }
