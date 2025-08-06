@@ -57,8 +57,8 @@ export default function TestEFIPage() {
           <p className="text-gray-600 mb-4">
             Test if your EFI credentials are working correctly.
           </p>
-          <Button 
-            onClick={testConnection} 
+          <Button
+            onClick={testConnection}
             disabled={loading}
             className="w-full"
           >
@@ -67,12 +67,14 @@ export default function TestEFIPage() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Create Test Subscription</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Create Test Subscription
+          </h2>
           <p className="text-gray-600 mb-4">
             Create a test subscription for R$ 29.90 to verify the complete flow.
           </p>
-          <Button 
-            onClick={createTestSubscription} 
+          <Button
+            onClick={createTestSubscription}
             disabled={loading}
             variant="outline"
             className="w-full"
@@ -92,9 +94,9 @@ export default function TestEFIPage() {
             {result.subscription?.payment_url && (
               <div className="mt-4">
                 <p className="font-medium mb-2">Payment Link:</p>
-                <a 
-                  href={result.subscription.payment_url} 
-                  target="_blank" 
+                <a
+                  href={result.subscription.payment_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline break-all"
                 >

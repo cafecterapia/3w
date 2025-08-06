@@ -52,31 +52,40 @@ interface PaymentManagementContextType {
   billingInfo: BillingInfo | null;
   paymentSettings: PaymentSettings;
   paymentHistory: PaymentHistory[];
-  
+
   // Loading states
   isLoading: boolean;
   isUpdating: boolean;
-  
+
   // Actions
-  addPaymentMethod: (method: Omit<PaymentMethod, 'id' | 'createdAt'>) => Promise<void>;
-  updatePaymentMethod: (id: string, updates: Partial<PaymentMethod>) => Promise<void>;
+  addPaymentMethod: (
+    method: Omit<PaymentMethod, 'id' | 'createdAt'>
+  ) => Promise<void>;
+  updatePaymentMethod: (
+    id: string,
+    updates: Partial<PaymentMethod>
+  ) => Promise<void>;
   removePaymentMethod: (id: string) => Promise<void>;
   setDefaultPaymentMethod: (id: string) => Promise<void>;
   updateBillingInfo: (info: BillingInfo) => Promise<void>;
   updatePaymentSettings: (settings: Partial<PaymentSettings>) => Promise<void>;
   refreshData: () => Promise<void>;
-  
+
   // Error handling
   error: string | null;
   clearError: () => void;
 }
 
-const PaymentManagementContext = createContext<PaymentManagementContextType | undefined>(undefined);
+const PaymentManagementContext = createContext<
+  PaymentManagementContextType | undefined
+>(undefined);
 
 export function usePaymentManagement() {
   const context = useContext(PaymentManagementContext);
   if (context === undefined) {
-    throw new Error('usePaymentManagement must be used within a PaymentManagementProvider');
+    throw new Error(
+      'usePaymentManagement must be used within a PaymentManagementProvider'
+    );
   }
   return context;
 }
@@ -86,7 +95,10 @@ interface PaymentManagementProviderProps {
   children: React.ReactNode;
 }
 
-export function PaymentManagementProvider({ userId, children }: PaymentManagementProviderProps) {
+export function PaymentManagementProvider({
+  userId,
+  children,
+}: PaymentManagementProviderProps) {
   // State
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [billingInfo, setBillingInfo] = useState<BillingInfo | null>(null);
@@ -168,14 +180,14 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Simulate API calls
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         setPaymentMethods(mockPaymentMethods);
         setBillingInfo(mockBillingInfo);
         setPaymentHistory(mockPaymentHistory);
-        
+
         setError(null);
       } catch (err) {
         setError('Erro ao carregar dados de pagamento');
@@ -189,13 +201,15 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
   }, [userId]);
 
   // Actions
-  const addPaymentMethod = async (method: Omit<PaymentMethod, 'id' | 'createdAt'>) => {
+  const addPaymentMethod = async (
+    method: Omit<PaymentMethod, 'id' | 'createdAt'>
+  ) => {
     try {
       setIsUpdating(true);
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const newMethod: PaymentMethod = {
         ...method,
@@ -203,7 +217,7 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
         createdAt: new Date(),
       };
 
-      setPaymentMethods(prev => [...prev, newMethod]);
+      setPaymentMethods((prev) => [...prev, newMethod]);
     } catch (err) {
       setError('Erro ao adicionar método de pagamento');
       console.error('Error adding payment method:', err);
@@ -213,16 +227,19 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
     }
   };
 
-  const updatePaymentMethod = async (id: string, updates: Partial<PaymentMethod>) => {
+  const updatePaymentMethod = async (
+    id: string,
+    updates: Partial<PaymentMethod>
+  ) => {
     try {
       setIsUpdating(true);
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setPaymentMethods(prev =>
-        prev.map(method =>
+      setPaymentMethods((prev) =>
+        prev.map((method) =>
           method.id === id ? { ...method, ...updates } : method
         )
       );
@@ -241,9 +258,9 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setPaymentMethods(prev => prev.filter(method => method.id !== id));
+      setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
     } catch (err) {
       setError('Erro ao remover método de pagamento');
       console.error('Error removing payment method:', err);
@@ -259,10 +276,10 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setPaymentMethods(prev =>
-        prev.map(method => ({
+      setPaymentMethods((prev) =>
+        prev.map((method) => ({
           ...method,
           isDefault: method.id === id,
         }))
@@ -282,7 +299,7 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setBillingInfo(info);
     } catch (err) {
@@ -300,9 +317,9 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setPaymentSettings(prev => ({ ...prev, ...settings }));
+      setPaymentSettings((prev) => ({ ...prev, ...settings }));
     } catch (err) {
       setError('Erro ao atualizar configurações de pagamento');
       console.error('Error updating payment settings:', err);
@@ -318,7 +335,7 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
       setError(null);
 
       // Simulate API calls
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setPaymentMethods(mockPaymentMethods);
       setBillingInfo(mockBillingInfo);
@@ -342,11 +359,11 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
     billingInfo,
     paymentSettings,
     paymentHistory,
-    
+
     // Loading states
     isLoading,
     isUpdating,
-    
+
     // Actions
     addPaymentMethod,
     updatePaymentMethod,
@@ -355,7 +372,7 @@ export function PaymentManagementProvider({ userId, children }: PaymentManagemen
     updateBillingInfo,
     updatePaymentSettings,
     refreshData,
-    
+
     // Error handling
     error,
     clearError,

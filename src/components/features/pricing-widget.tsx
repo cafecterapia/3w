@@ -1,172 +1,266 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader, CardContent, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
-
-const BASE_PRICE_PER_CLASS = 50.00;
-const DISCOUNT_THRESHOLD = 4;
-const DISCOUNT_PERCENTAGE = 10;
+import {
+  calculatePricing,
+  DISCOUNT_THRESHOLD,
+  DISCOUNT_PERCENTAGE,
+  SCHEDULING_DISCOUNT_PERCENTAGE,
+} from '../../lib/pricing-constants';
 
 interface PricingWidgetProps {
   className?: string;
   showHeader?: boolean;
   maxClasses?: number;
-  redirectToPayment?: boolean; // New prop for authenticated users
+  redirectToPayment?: boolean;
+  initialClassCount?: number;
 }
 
-export function PricingWidget({ 
+export function PricingWidget({
   className = '',
   showHeader = true,
   maxClasses = 8,
-  redirectToPayment = false
+  redirectToPayment = false,
+  initialClassCount = 1,
 }: PricingWidgetProps) {
-  const [classCount, setClassCount] = useState(4);
+  const [classCount, setClassCount] = useState(initialClassCount);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
-  const calculatePrice = (classes: number) => {
-    const baseTotal = classes * BASE_PRICE_PER_CLASS;
-    const discountApplied = classes >= DISCOUNT_THRESHOLD ? DISCOUNT_PERCENTAGE : 0;
-    const discountAmount = baseTotal * (discountApplied / 100);
-    return {
-      baseTotal,
-      discountAmount,
-      finalPrice: baseTotal - discountAmount,
-      discountPercentage: discountApplied
-    };
+  const pricing = useMemo(() => {
+    return calculatePricing(classCount, 'recurring');
+  }, [classCount]);
+
+  const fillPercent =
+    maxClasses > 1 ? ((classCount - 1) / (maxClasses - 1)) * 100 : 100;
+
+  const handlePayment = async () => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const response = await fetch(
+          '/api/payments/create-class-subscription',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              classCount,
+              schedulingOption: 'recurring',
+              totalPrice: pricing.finalPrice,
+              discountApplied: pricing.totalDiscountPercentage,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          // Handle non-successful HTTP responses
+          const errorData = await response
+            .json()
+            .catch(() => ({ message: 'An unexpected error occurred.' }));
+          throw new Error(
+            errorData.message || 'Failed to create subscription.'
+          );
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.paymentConfirmationUrl) {
+          window.location.href = data.paymentConfirmationUrl;
+        } else {
+          // Handle cases where the API returns a success but no payment URL
+          setError('Could not retrieve payment URL. Please try again.');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'An unknown error occurred. Please try again.'
+        );
+      }
+    });
   };
 
-  const pricing = calculatePrice(classCount);
-
   return (
-    <div className={`max-w-lg mx-auto ${className}`}>
-      {showHeader && (
-        <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            Escolha Seu Plano
-          </h3>
-          <p className="text-gray-600">
-            Mais aulas = mais desconto
-          </p>
-        </div>
-      )}
+    <>
+      <style jsx>{`
+        .range-slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: white;
+          border: 2px solid #000;
+          cursor: pointer;
+        }
+        
+        .range-slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: white;
+          border: 2px solid #000;
+          cursor: pointer;
+          box-sizing: border-box;
+        }
+        
+        .range-slider::-ms-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: white;
+          border: 2px solid #000;
+          cursor: pointer;
+        }
+      `}</style>
+      <div className={`max-w-lg mx-auto text-foreground ${className}`}>
+        {showHeader && (
+          <div className="text-center mb-4">
+            <h3 className="text-xl font-bold">Planos</h3>
+            <p className="text-sm text-gray-600">
+              Mais aulas, menor preço.
+            </p>
+          </div>
+        )}
 
-      <Card>
+      <Card className="border border-gray-200 bg-white rounded-lg shadow-sm">
         <CardHeader>
           <div className="text-center">
-            <div className="text-sm text-gray-600 mb-2">Quantidade de aulas</div>
-            <div className="text-3xl font-bold text-blue-600">
-              {classCount}
+            <div className="text-xs text-gray-600 mb-1.5">
+              Aulas por mês
             </div>
+            <div className="text-3xl font-bold">{classCount}</div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-xs text-gray-600">
               <span>1</span>
               <span>{maxClasses}</span>
             </div>
+
             <input
               type="range"
-              min="1"
+              min={1}
               max={maxClasses}
               value={classCount}
-              onChange={(e) => setClassCount(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              onChange={(e) => setClassCount(parseInt(e.target.value, 10))}
+              aria-label="Selecionar quantidade de aulas"
+              className="w-full appearance-none cursor-pointer h-1 rounded-full outline-none disabled:opacity-50 range-slider"
+              disabled={isPending}
               style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((classCount - 1) / (maxClasses - 1)) * 100}%, #e5e7eb ${((classCount - 1) / (maxClasses - 1)) * 100}%, #e5e7eb 100%)`
+                background: `linear-gradient(to right, var(--color-gray-900) 0%, var(--color-gray-900) ${fillPercent}%, var(--color-gray-200) ${fillPercent}%, var(--color-gray-200) 100%)`,
               }}
             />
           </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 grid gap-2">
+            <Row
+              label="Subtotal"
+              value={`R$ ${pricing.baseTotal.toFixed(2)}`}
+              muted
+            />
 
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Subtotal:</span>
-              <span className="text-sm">R$ {pricing.baseTotal.toFixed(2)}</span>
-            </div>
-            
-            {pricing.discountPercentage > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span className="text-sm">Desconto ({pricing.discountPercentage}%):</span>
-                <span className="text-sm">- R$ {pricing.discountAmount.toFixed(2)}</span>
-              </div>
+            {pricing.totalDiscountPercentage > 0 && (
+              <>
+                {pricing.discountPercentage > 0 && (
+                  <Row
+                    label={`Desconto volume (${pricing.discountPercentage}%)`}
+                    value={`- R$ ${(pricing.baseTotal * (pricing.discountPercentage / 100)).toFixed(2)}`}
+                    strong
+                  />
+                )}
+                {pricing.schedulingDiscountPercentage > 0 && (
+                  <Row
+                    label={`Desconto agendamento fixo (${pricing.schedulingDiscountPercentage}%)`}
+                    value={`- R$ ${(pricing.baseTotal * (pricing.schedulingDiscountPercentage / 100)).toFixed(2)}`}
+                    strong
+                  />
+                )}
+              </>
             )}
-            
-            <hr className="border-gray-300" />
-            
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">Total:</span>
-              <span className="text-xl font-bold text-green-600">
-                R$ {pricing.finalPrice.toFixed(2)}
-              </span>
-            </div>
-            
-            <div className="text-center text-xs text-gray-500">
-              R$ {(pricing.finalPrice / classCount).toFixed(2)} por aula
+
+            <div className="h-px bg-gray-200" />
+
+            <Row
+              label="Total"
+              value={`R$ ${pricing.finalPrice.toFixed(2)}`}
+              strong
+              large
+            />
+            <div className="text-xs text-center text-gray-600">
+              R$ {pricing.unitPrice.toFixed(2)} por aula
             </div>
           </div>
 
-          {classCount < DISCOUNT_THRESHOLD && (
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-3">
-              <p className="text-sm text-blue-700">
-                💡 Adicione {DISCOUNT_THRESHOLD - classCount} aula{DISCOUNT_THRESHOLD - classCount > 1 ? 's' : ''} e ganhe {DISCOUNT_PERCENTAGE}% de desconto!
-              </p>
+          {classCount < DISCOUNT_THRESHOLD && !isPending && (
+            <div className="bg-gray-50 border-l-4 border-gray-400 p-2 rounded-lg text-sm text-gray-700">
+              Falta(m) {DISCOUNT_THRESHOLD - classCount} aula(s) para{' '}
+              {DISCOUNT_PERCENTAGE}% off.
+              <br />
+              <small>
+                Agendamento fixo semanal: +{SCHEDULING_DISCOUNT_PERCENTAGE}% off
+                adicional.
+              </small>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 p-2 rounded-lg text-sm text-red-700 text-center">
+              {error}
             </div>
           )}
         </CardContent>
-        
+
         <CardFooter>
-          {redirectToPayment ? (
-            <Button 
-              size="lg" 
-              className="w-full"
-              onClick={async () => {
-                try {
-                  // Call the payment API directly for authenticated users
-                  const response = await fetch('/api/payments/create-class-subscription', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      classCount,
-                      schedulingOption: 'recurring', // Default to recurring for quick selection
-                      totalPrice: pricing.finalPrice,
-                      discountApplied: pricing.discountPercentage
-                    }),
-                  });
-
-                  const data = await response.json();
-
-                  if (data.success && data.paymentUrl) {
-                    window.location.href = data.paymentUrl;
-                  } else if (data.success) {
-                    // Redirect to detailed plan selection
-                    window.location.href = `/plans?classes=${classCount}`;
-                  } else {
-                    alert('Erro ao processar pagamento. Tente novamente.');
-                  }
-                } catch (error) {
-                  console.error('Error:', error);
-                  alert('Erro ao processar pagamento. Tente novamente.');
-                }
-              }}
-            >
-              Comprar Agora
-            </Button>
-          ) : (
-            <Link
-              href={`/plans?classes=${classCount}`}
-              className="w-full"
-            >
-              <Button size="lg" className="w-full">
-                Escolher Este Plano
-              </Button>
-            </Link>
-          )}
+          <Button
+            variant="secondary"
+            size="lg"
+            className="w-full !bg-gray-900 !text-white rounded-lg h-11 !border-0"
+            onClick={handlePayment}
+            disabled={isPending}
+          >
+            {isPending ? 'Processing...' : 'Pagar agora'}
+          </Button>
         </CardFooter>
       </Card>
+    </div>
+    </>
+  );
+}
+
+function Row({
+  label,
+  value,
+  strong = false,
+  muted = false,
+  large = false,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  muted?: boolean;
+  large?: boolean;
+}) {
+  return (
+    <div className="flex justify-between items-baseline">
+      <span
+        className={`${large ? 'text-sm' : 'text-xs'} ${
+          muted ? 'text-gray-600' : 'text-foreground'
+        } ${strong ? 'font-semibold' : 'font-medium'}`}
+      >
+        {label}
+      </span>
+      <span
+        className={`${large ? 'text-lg' : 'text-xs'} text-foreground ${
+          strong ? 'font-bold' : 'font-semibold'
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }

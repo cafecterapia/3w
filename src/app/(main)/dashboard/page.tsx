@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { getDashboardData } from '@/lib/data'; // Import our new function
 import { format } from 'date-fns'; // A great library for date formatting
 import { ptBR } from 'date-fns/locale';
-import { PricingWidget } from '@/components/features/pricing-widget';
+import { SubscriptionStatusWidget } from './subscription-status-widget';
 
 export const metadata: Metadata = {
   title: 'Painel — Portal do Aluno',
@@ -58,54 +58,8 @@ export default async function DashboardPage() {
           </div>
         </header>
 
-        {/* Show pricing widget for users without active subscription */}
-        {(!subscription || subscription.status === 'inactive' || subscription.status === 'cancelled') ? (
-          <section className="mb-10 sm:mb-12">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6 sm:p-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Comece Sua Jornada de Bem-Estar
-                </h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Você ainda não possui um plano ativo. Escolha quantas aulas você quer por mês 
-                  e comece hoje mesmo!
-                </p>
-              </div>
-              <PricingWidget 
-                showHeader={false}
-                className="max-w-md mx-auto"
-                redirectToPayment={true}
-              />
-              <div className="text-center mt-4">
-                <Link 
-                  href="/plans"
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  Ver todas as opções de agendamento
-                </Link>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="mb-10 sm:mb-12">
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 p-6">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  🎉 Sua assinatura está ativa!
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Aproveite suas aulas e mantenha sua rotina de bem-estar em dia.
-                </p>
-                <Link 
-                  href="/billing/manage"
-                  className="inline-flex items-center justify-center rounded-md bg-green-600 text-white px-6 py-2 text-sm font-medium hover:bg-green-700 transition-colors"
-                >
-                  Gerenciar Plano
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Subscription status widget */}
+        <SubscriptionStatusWidget subscription={subscription} />
 
         {/* Top grid: Status + Próximo pagamento + Ações rápidas */}
         <section aria-labelledby="resumo-assinatura" className="mb-10 sm:mb-12">
@@ -119,13 +73,16 @@ export default async function DashboardPage() {
                 <div>
                   <CardTitle>Assinatura</CardTitle>
                   <p className="mt-1 text-sm text-accent">
-                    {subscription?.plan || 'Nenhum plano ativo'}
+                    {subscription?.type === 'mensal' ? 'Mensal' : subscription?.type === 'avulsa' ? 'Avulsa' : 'Nenhuma assinatura ativa'}
                   </p>
                 </div>
                 {/* We pass the status, or a default string if no subscription */}
                 <StatusPill status={subscription?.status || 'inactive'} />
               </div>
               <div className="mt-4">
+                <p className="text-lg font-semibold">
+                  {subscription?.creditsRemaining || 0} de {subscription?.totalCredits || 0} aulas restantes
+                </p>
                 <Link
                   href="/billing/manage"
                   className="text-sm font-medium hover:underline underline-offset-4"
@@ -327,6 +284,21 @@ function CardTitle({ children }: { children: React.ReactNode }) {
 
 function StatusPill({ status }: { status: string }) {
   const statusInfo: { label: string; tone: string } = {
+    ACTIVE: { label: 'Ativa', tone: 'bg-green-500/20 text-green-700' },
+    PENDING: {
+      label: 'Pendente',
+      tone: 'bg-yellow-500/20 text-yellow-700',
+    },
+    PAST_DUE: { label: 'Em atraso', tone: 'bg-red-500/20 text-red-700' },
+    CANCELED: {
+      label: 'Cancelada',
+      tone: 'bg-muted-foreground/20 text-muted-foreground',
+    },
+    inactive: {
+      label: 'Inativa',
+      tone: 'bg-muted-foreground/20 text-muted-foreground',
+    },
+    // Legacy support for lowercase
     active: { label: 'Ativa', tone: 'bg-green-500/20 text-green-700' },
     trialing: {
       label: 'Em avaliação',
@@ -335,10 +307,6 @@ function StatusPill({ status }: { status: string }) {
     past_due: { label: 'Em atraso', tone: 'bg-red-500/20 text-red-700' },
     canceled: {
       label: 'Cancelada',
-      tone: 'bg-muted-foreground/20 text-muted-foreground',
-    },
-    inactive: {
-      label: 'Inativa',
       tone: 'bg-muted-foreground/20 text-muted-foreground',
     },
   }[status] || { label: 'Desconhecido', tone: 'bg-muted' };

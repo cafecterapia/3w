@@ -66,12 +66,6 @@ export function SubscriptionStatus({
             You don&apos;t have an active subscription. Choose a plan to get
             started.
           </p>
-          <a
-            href="/pricing"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-          >
-            View Plans
-          </a>
         </div>
       </div>
     );

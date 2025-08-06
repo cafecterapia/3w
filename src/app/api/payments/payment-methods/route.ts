@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       case 'add_payment_method':
         // TODO: Integrate with EFI to add payment method
         console.log('Adding payment method for user:', session.user.id);
-        
+
         return NextResponse.json({
           success: true,
           paymentMethod: {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       case 'update_payment_method':
         // TODO: Integrate with EFI to update payment method
         console.log('Updating payment method:', paymentMethodId);
-        
+
         return NextResponse.json({
           success: true,
           message: 'Payment method updated successfully',
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       case 'remove_payment_method':
         // TODO: Integrate with EFI to remove payment method
         console.log('Removing payment method:', paymentMethodId);
-        
+
         return NextResponse.json({
           success: true,
           message: 'Payment method removed successfully',
@@ -98,17 +98,14 @@ export async function POST(request: NextRequest) {
       case 'set_default_payment_method':
         // TODO: Integrate with EFI to set default payment method
         console.log('Setting default payment method:', paymentMethodId);
-        
+
         return NextResponse.json({
           success: true,
           message: 'Default payment method updated successfully',
         });
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
     console.error('Error managing payment method:', error);

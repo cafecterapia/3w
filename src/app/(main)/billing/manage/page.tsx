@@ -8,7 +8,8 @@ import { PaymentManagementContent } from './payment-management-content';
 
 export const metadata: Metadata = {
   title: 'Gerenciar Pagamentos — Portal do Aluno',
-  description: 'Gerencie métodos de pagamento, cartões e informações de cobrança.',
+  description:
+    'Gerencie métodos de pagamento, cartões e informações de cobrança.',
 };
 
 export default async function PaymentManagementPage() {
@@ -45,13 +46,17 @@ export default async function PaymentManagementPage() {
             Gerenciar Pagamentos
           </h1>
           <p className="mt-2 text-accent">
-            Controle seus métodos de pagamento, informações de cobrança e dados do cartão com segurança.
+            Controle seus métodos de pagamento, informações de cobrança e dados
+            do cartão com segurança.
           </p>
         </header>
 
         {/* Payment Management Interface */}
         <PaymentManagementProvider userId={session.user.id}>
-          <PaymentManagementContent userName={session.user.name} userEmail={session.user.email} />
+          <PaymentManagementContent
+            userName={session.user.name}
+            userEmail={session.user.email}
+          />
         </PaymentManagementProvider>
       </div>
     </main>

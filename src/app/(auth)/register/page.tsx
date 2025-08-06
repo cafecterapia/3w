@@ -10,11 +10,16 @@ interface RegisterPageProps {
 }
 
 export default function RegisterPage({ searchParams }: RegisterPageProps) {
-  const planDetails = searchParams.plan && searchParams.scheduling && searchParams.price ? {
-    classCount: parseInt(searchParams.plan),
-    schedulingOption: searchParams.scheduling as 'recurring' | 'on-demand',
-    totalPrice: parseFloat(searchParams.price)
-  } : null;
+  const planDetails =
+    searchParams.plan && searchParams.scheduling && searchParams.price
+      ? {
+          classCount: parseInt(searchParams.plan),
+          schedulingOption: searchParams.scheduling as
+            | 'recurring'
+            | 'on-demand',
+          totalPrice: parseFloat(searchParams.price),
+        }
+      : null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -29,9 +34,12 @@ export default function RegisterPage({ searchParams }: RegisterPageProps) {
                 Seu plano selecionado:
               </h3>
               <p className="text-sm text-blue-700">
-                {planDetails.classCount} aula{planDetails.classCount > 1 ? 's' : ''} • 
-                {planDetails.schedulingOption === 'recurring' ? ' Aula Fixa Semanal' : ' Aulas Sob Demanda'} • 
-                R$ {planDetails.totalPrice.toFixed(2)}
+                {planDetails.classCount} aula
+                {planDetails.classCount > 1 ? 's' : ''} •
+                {planDetails.schedulingOption === 'recurring'
+                  ? ' Aula Fixa Semanal'
+                  : ' Aulas Sob Demanda'}{' '}
+                • R$ {planDetails.totalPrice.toFixed(2)}
               </p>
               <p className="text-xs text-blue-600 mt-1">
                 Após criar sua conta, você será direcionado para o pagamento.

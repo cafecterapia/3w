@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,11 @@ function IconShield() {
       fill="none"
       stroke="currentColor"
       aria-hidden="true"
-      style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
     >
       <path d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z" />
       <path d="m9 12 2 2 4-4" />
@@ -32,7 +36,11 @@ function IconUser() {
       fill="none"
       stroke="currentColor"
       aria-hidden="true"
-      style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
     >
       <circle cx="12" cy="7" r="4" />
       <path d="M5 21a7 7 0 0 1 14 0" />
@@ -49,7 +57,11 @@ function IconLogOut() {
       fill="none"
       stroke="currentColor"
       aria-hidden="true"
-      style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
     >
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16,17 21,12 16,7" />
@@ -101,7 +113,14 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
             }}
           >
             {/* Brand / Title */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
               <div
                 aria-hidden="true"
                 style={{
@@ -111,7 +130,8 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
                   display: 'grid',
                   placeItems: 'center',
                   color: 'var(--color-foreground)',
-                  background: 'linear-gradient(180deg, var(--color-gray-50), transparent)',
+                  background:
+                    'linear-gradient(180deg, var(--color-gray-50), transparent)',
                   border: '1px solid var(--color-gray-200)',
                 }}
               >
@@ -131,7 +151,14 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
             </div>
 
             {/* Right cluster */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
               {/* Logged in */}
               <div
                 title={userEmail}
@@ -147,7 +174,14 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
                   maxWidth: '60vw',
                 }}
               >
-                <span aria-hidden="true" style={{ display: 'inline-grid', placeItems: 'center', color: 'var(--color-gray-700)' }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    display: 'inline-grid',
+                    placeItems: 'center',
+                    color: 'var(--color-gray-700)',
+                  }}
+                >
                   <IconUser />
                 </span>
                 <span
@@ -203,7 +237,8 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-gray-100)';
+                  e.currentTarget.style.backgroundColor =
+                    'var(--color-gray-100)';
                   e.currentTarget.style.color = 'var(--color-foreground)';
                 }}
                 onMouseLeave={(e) => {
@@ -221,7 +256,11 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
       <style jsx global>{`
         @supports (backdrop-filter: blur(6px)) {
           header[role='banner'] {
-            background-color: color-mix(in oklab, var(--color-background) 90%, transparent);
+            background-color: color-mix(
+              in oklab,
+              var(--color-background) 90%,
+              transparent
+            );
           }
         }
       `}</style>

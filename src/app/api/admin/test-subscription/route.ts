@@ -20,12 +20,15 @@ export async function POST(request: NextRequest) {
         id: true,
         name: true,
         email: true,
-        cpf: true
-      }
+        cpf: true,
+      },
     });
 
     if (!adminUser) {
-      return NextResponse.json({ error: 'Admin user not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Admin user not found' },
+        { status: 404 }
+      );
     }
 
     // Create test subscription
@@ -44,21 +47,24 @@ export async function POST(request: NextRequest) {
       where: { id: adminUser.id },
       data: {
         efiSubscriptionId: subscription.id,
-        subscriptionStatus: 'PENDING'
-      }
+        subscriptionStatus: 'PENDING',
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       subscription,
-      message: 'Test subscription created successfully'
+      message: 'Test subscription created successfully',
     });
   } catch (error) {
     console.error('Test subscription creation failed:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to create test subscription',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to create test subscription',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }

@@ -12,18 +12,21 @@ export async function POST(request: NextRequest) {
 
     // Test EFI connection by creating a test charge (without actually processing)
     const testResponse = await efiService.testConnection();
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       message: 'EFI connection successful',
-      data: testResponse 
+      data: testResponse,
     });
   } catch (error) {
     console.error('EFI connection test failed:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'EFI connection failed',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'EFI connection failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }

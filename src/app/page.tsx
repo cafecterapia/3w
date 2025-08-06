@@ -23,14 +23,8 @@ export default function Page() {
             </p>
             <div className="flex items-center gap-6 pt-2">
               <Link
-                href="/plans"
-                className="inline-flex items-center justify-center rounded-md bg-primary text-secondary px-5 py-3 text-sm font-medium tracking-tight hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-              >
-                Ver Planos de Aulas
-              </Link>
-              <Link
                 href="/register"
-                className="inline-flex items-center justify-center rounded-md border border-primary text-primary px-5 py-3 text-sm font-medium tracking-tight hover:bg-primary hover:text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                className="inline-flex items-center justify-center rounded-md bg-primary text-secondary px-5 py-3 text-sm font-medium tracking-tight hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
               >
                 Criar Minha Conta
               </Link>
@@ -102,16 +96,9 @@ export default function Page() {
                 Planos Flexíveis
               </h2>
               <p className="mt-4 text-base sm:text-lg text-accent max-w-2xl mx-auto">
-                Escolha quantas aulas você quer por mês. Quanto mais aulas, maior o desconto!
+                Escolha quantas aulas você quer por mês. Quanto mais aulas,
+                maior o desconto!
               </p>
-              <div className="mt-8 text-center">
-                <Link
-                  href="/plans"
-                  className="inline-flex items-center justify-center rounded-md bg-primary text-secondary px-8 py-4 text-lg font-medium tracking-tight hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-                >
-                  Ver Todos os Planos
-                </Link>
-              </div>
             </div>
           </div>
         </section>

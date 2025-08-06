@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
-
 model User {
   id                 String    @id @default(cuid())
   name               String?
@@ -19,12 +14,19 @@ model User {
   emailVerified      DateTime?
   image              String?
   password           String?
-  cpf                String?   @unique
-  role               UserRole  @default(USER)
   efiSubscriptionId  String?   @unique
   subscriptionStatus String?
   currentPeriodEnd   DateTime?
   pushSubscription   String?
+  role               UserRole  @default(USER)
+  cpf                String?   @unique
+  paymentCreatedAt   DateTime?
+  efiLocationId      Int?
+  qrCodeImage        String?
+  qrCodeText         String?
+  classCount         Int?      // Number of classes purchased
+  schedulingOption   String?   // 'recurring' or 'on-demand'
+  classesUsed        Int?      @default(0) // Track how many classes have been used
   accounts           Account[]
   sessions           Session[]
 }
@@ -61,4 +63,9 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }

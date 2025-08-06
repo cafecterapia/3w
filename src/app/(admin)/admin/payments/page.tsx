@@ -14,7 +14,8 @@ export default async function PaymentSettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Payment Settings</h1>
         <p className="text-gray-600">
-          Configure your EFI payment gateway to receive money from subscriptions.
+          Configure your EFI payment gateway to receive money from
+          subscriptions.
         </p>
       </div>
 
@@ -29,21 +30,41 @@ export default async function PaymentSettingsPage() {
           🏦 How to Connect Your Bank Account
         </h3>
         <div className="text-blue-800 space-y-2 text-sm">
-          <p><strong>1. Create an EFI Account:</strong></p>
+          <p>
+            <strong>1. Create an EFI Account:</strong>
+          </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
-            <li>Visit <a href="https://app.gerencianet.com.br" target="_blank" className="underline">app.gerencianet.com.br</a></li>
+            <li>
+              Visit{' '}
+              <a
+                href="https://app.gerencianet.com.br"
+                target="_blank"
+                className="underline"
+              >
+                app.gerencianet.com.br
+              </a>
+            </li>
             <li>Create a business account with your bank details</li>
             <li>Complete the verification process</li>
           </ul>
-          
-          <p><strong>2. Get API Credentials:</strong></p>
+
+          <p>
+            <strong>2. Get API Credentials:</strong>
+          </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li>Go to API section in your EFI dashboard</li>
             <li>Generate Client ID and Client Secret</li>
-            <li>Set up webhook URL: <code className="bg-blue-100 px-1 rounded">{process.env.NEXTAUTH_URL}/api/webhooks/efi</code></li>
+            <li>
+              Set up webhook URL:{' '}
+              <code className="bg-blue-100 px-1 rounded">
+                {process.env.NEXTAUTH_URL}/api/webhooks/efi
+              </code>
+            </li>
           </ul>
-          
-          <p><strong>3. Bank Integration:</strong></p>
+
+          <p>
+            <strong>3. Bank Integration:</strong>
+          </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li>Link your business bank account in EFI dashboard</li>
             <li>Set up automatic transfers (usually next business day)</li>

@@ -7,16 +7,16 @@
 ├── .prettierignore         # Prettier ignore configuration
 ├── .prettierrc.json        # Prettier configuration
 ├── cypress.config.ts       # Cypress E2E testing configuration
-├── next.config.ts          # Next.js configuration (e.g., for PWA)
 ├── next-env.d.ts           # Next.js TypeScript definitions
 ├── package.json            # Project dependencies and scripts
 ├── package-lock.json       # Package lock file
 ├── postcss.config.js       # PostCSS configuration (for Tailwind)
 ├── test-db.js              # Database testing script
+├── test-pricing.js         # Pricing testing script
 ├── test-setup.ts           # Test setup configuration
 ├── tsconfig.json           # TypeScript configuration
 ├── tsconfig.tsbuildinfo    # TypeScript build info
-├── vitest.config.ts        # Vitest testing configuration
+└── vitest.config.ts        # Vitest testing configuration
 
 ├── .vscode/
 │   ├── settings.json       # VS Code workspace settings
@@ -40,6 +40,7 @@
 │   │   ├── e2e.ts          # E2E testing setup
 │   │   └── index.d.ts      # TypeScript definitions for Cypress
 │   └── videos/             # Test execution videos
+│       ├── .DS_Store       # macOS system file
 │       └── auth.cy.ts.mp4  # Recorded test execution
 
 ├── prisma/
@@ -52,7 +53,9 @@
 │       │   └── migration.sql
 │       ├── 20250804065656_add_user_role/
 │       │   └── migration.sql
-│       └── 20250804100258_add_cpf_field/
+│       ├── 20250804100258_add_cpf_field/
+│       │   └── migration.sql
+│       └── 20250805000000_add_payment_created_at/
 │           └── migration.sql
 
 ├── public/
@@ -93,7 +96,6 @@
     │   │       └── users/
     │   │           ├── page.tsx # User management page
     │   │           └── users-client.tsx # Client-side users component
-    │   │           └── users-client.tsx # Client-side users component
     │   │
     │   ├── (auth)/           # Route group for authentication pages
     │   │   ├── login/
@@ -110,18 +112,31 @@
     │   │   ├── layout.tsx      # Shared layout for the main app (e.g., with sidebar)
     │   │   ├── billing/
     │   │   │   ├── page.tsx    # Page to manage subscription, view invoices
-    │   │   │   └── manage/
-    │   │   │       ├── page.tsx # Payment management page
-    │   │   │       ├── payment-management-content.tsx # Client-side payment management content
-    │   │   │       └── payment-management-provider.tsx # Payment management provider
+    │   │   │   ├── manage/
+    │   │   │   │   ├── page.tsx # Payment management page
+    │   │   │   │   ├── payment-management-content.tsx # Client-side payment management content
+    │   │   │   │   └── payment-management-provider.tsx # Payment management provider
+    │   │   │   └── pay/
+    │   │   │       ├── page.tsx # Payment processing page
+    │   │   │       └── payment-confirmation.tsx # Payment confirmation component
     │   │   ├── dashboard/
-    │   │   │   └── page.tsx    # Main dashboard after login
+    │   │   │   ├── page.tsx    # Main dashboard after login
+    │   │   │   └── subscription-status-widget.tsx # Subscription status widget component
     │   │   ├── profile/
-    │   │   │   └── page.tsx    # User profile page
+    │   │   │   ├── page.tsx    # User profile page
+    │   │   │   └── complete/
+    │   │   │       ├── page.tsx # Profile completion page
+    │   │   │       └── profile-completion-form.tsx # Profile completion form component
     │   │   ├── settings/
     │   │   │   └── page.tsx    # User account settings
     │   │   └── support/
     │   │       └── page.tsx    # Support page
+    │   │
+    │   ├── (marketing)/        # Route group for marketing pages
+    │   │   ├── layout.tsx      # Marketing layout wrapper
+    │   │   └── plans/
+    │   │       ├── page.tsx    # Plans/pricing page
+    │   │       └── plan-selection-client.tsx # Client-side plan selection component
     │   │
     │   ├── api/                # API Routes (Your Backend-for-Frontend - BFF)
     │   │   ├── admin/
@@ -136,18 +151,30 @@
     │   │   │       └── route.ts # Auth.js catch-all route
     │   │   │
     │   │   ├── debug/
-    │   │   │   └── db/
-    │   │   │       └── route.ts # Database debugging endpoint
+    │   │   │   ├── db/
+    │   │   │   │   └── route.ts # Database debugging endpoint
+    │   │   │   └── payment-test/
+    │   │   │       └── route.ts # Payment testing endpoint
     │   │   │
     │   │   ├── payments/
     │   │   │   ├── billing-settings/
     │   │   │   │   └── route.ts # Billing settings management
+    │   │   │   ├── cancel/
+    │   │   │   │   └── route.ts # Payment cancellation endpoint
+    │   │   │   ├── create-class-subscription/
+    │   │   │   │   └── route.ts # Class subscription creation endpoint
     │   │   │   ├── create-subscription/
     │   │   │   │   └── route.ts # Server-side logic to create a subscription with Efi
     │   │   │   ├── manage-subscription/
     │   │   │   │   └── route.ts # Logic to create a portal link to manage billing
-    │   │   │   └── payment-methods/
-    │   │   │       └── route.ts # Payment methods management
+    │   │   │   ├── payment-methods/
+    │   │   │   │   └── route.ts # Payment methods management
+    │   │   │   └── status/
+    │   │   │       └── route.ts # Payment status endpoint
+    │   │   │
+    │   │   ├── profile/
+    │   │   │   └── update/
+    │   │   │       └── route.ts # Profile update endpoint
     │   │   │
     │   │   ├── push/
     │   │   │   ├── send-notification/
@@ -176,7 +203,7 @@
     │   │
     │   ├── features/         # Components for specific features
     │   │   ├── billing-portal.tsx
-    │   │   ├── pricing-table.tsx
+    │   │   ├── pricing-widget.tsx
     │   │   ├── push-notification-settings.tsx
     │   │   └── subscription-status.tsx
     │   │
@@ -198,6 +225,7 @@
     │   ├── auth.ts           # Auth.js configuration and options
     │   ├── data.ts           # Data access layer and utility functions
     │   ├── efi.ts            # Efi SDK initialization and helper functions
+    │   ├── pricing-constants.ts # Pricing plans and constants
     │   ├── prisma.ts         # Prisma client instance (singleton for performance)
     │   ├── useActionState.ts # Custom useActionState hook
     │   └── utils.ts          # Utility functions (e.g., formatting dates, currency)

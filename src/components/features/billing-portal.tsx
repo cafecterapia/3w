@@ -18,9 +18,9 @@ export function BillingPortal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           userId,
-          action: 'create_portal_session'
+          action: 'create_portal_session',
         }),
       });
 

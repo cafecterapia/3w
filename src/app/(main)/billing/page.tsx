@@ -1,13 +1,53 @@
 // app/billing/page.tsx
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Faturamento — Portal do Aluno',
   description: 'Gerencie sua assinatura, faturas e forma de pagamento.',
 };
 
-export default function BillingPage() {
+function SuccessMessage({
+  searchParams,
+}: {
+  searchParams: { success?: string };
+}) {
+  if (searchParams.success === 'true') {
+    return (
+      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center">
+          <svg
+            className="w-5 h-5 text-green-600 mr-2"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div>
+            <h3 className="text-sm font-medium text-green-800">
+              Pagamento confirmado!
+            </h3>
+            <p className="text-sm text-green-600 mt-1">
+              Sua assinatura foi ativada com sucesso. Bem-vindo!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+interface BillingPageProps {
+  searchParams: { success?: string };
+}
+
+export default function BillingPage({ searchParams }: BillingPageProps) {
   // Replace with real data from your billing provider
   const plan = {
     name: 'Plano Premium',
@@ -45,6 +85,11 @@ export default function BillingPage() {
   return (
     <main className="min-h-dvh bg-background text-foreground">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        {/* Success Message */}
+        <Suspense fallback={null}>
+          <SuccessMessage searchParams={searchParams} />
+        </Suspense>
+
         {/* Header */}
         <header className="mb-10 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">

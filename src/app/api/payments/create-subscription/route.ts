@@ -42,8 +42,9 @@ export async function POST(request: NextRequest) {
     // Validate required user information for Efí
     if (!user.name || !user.email) {
       return NextResponse.json(
-        { 
-          error: 'Missing required user information. Please complete your profile with name and email.' 
+        {
+          error:
+            'Missing required user information. Please complete your profile with name and email.',
         },
         { status: 400 }
       );

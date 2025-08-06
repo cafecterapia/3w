@@ -30,12 +30,16 @@ export function PaymentSettingsForm() {
   });
 
   const [isTestingConnection, setIsTestingConnection] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [connectionStatus, setConnectionStatus] = useState<
+    'idle' | 'success' | 'error'
+  >('idle');
 
   const handleSave = async () => {
     try {
       // In a real implementation, you'd save to database or update environment
-      alert('Payment settings saved! Please update your .env.local file with these values.');
+      alert(
+        'Payment settings saved! Please update your .env.local file with these values.'
+      );
       console.log('Settings to save:', settings);
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -73,7 +77,9 @@ export function PaymentSettingsForm() {
     <div className="space-y-6">
       {/* EFI API Settings */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">EFI API Configuration</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          EFI API Configuration
+        </h3>
         <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -82,7 +88,12 @@ export function PaymentSettingsForm() {
             <input
               type="text"
               value={settings.efiClientId}
-              onChange={(e) => setSettings(prev => ({ ...prev, efiClientId: e.target.value }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  efiClientId: e.target.value,
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Your EFI Client ID"
             />
@@ -95,7 +106,12 @@ export function PaymentSettingsForm() {
             <input
               type="password"
               value={settings.efiClientSecret}
-              onChange={(e) => setSettings(prev => ({ ...prev, efiClientSecret: e.target.value }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  efiClientSecret: e.target.value,
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Your EFI Client Secret"
             />
@@ -107,7 +123,12 @@ export function PaymentSettingsForm() {
             </label>
             <select
               value={settings.efiEnvironment}
-              onChange={(e) => setSettings(prev => ({ ...prev, efiEnvironment: e.target.value as 'sandbox' | 'production' }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  efiEnvironment: e.target.value as 'sandbox' | 'production',
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="sandbox">Sandbox (Testing)</option>
@@ -122,7 +143,12 @@ export function PaymentSettingsForm() {
             <input
               type="password"
               value={settings.efiWebhookSecret}
-              onChange={(e) => setSettings(prev => ({ ...prev, efiWebhookSecret: e.target.value }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  efiWebhookSecret: e.target.value,
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Your EFI Webhook Secret"
             />
@@ -135,7 +161,9 @@ export function PaymentSettingsForm() {
 
       {/* Bank Account Information */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Bank Account Information</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Bank Account Information
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -144,10 +172,12 @@ export function PaymentSettingsForm() {
             <input
               type="text"
               value={settings.bankAccount.bank}
-              onChange={(e) => setSettings(prev => ({ 
-                ...prev, 
-                bankAccount: { ...prev.bankAccount, bank: e.target.value }
-              }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  bankAccount: { ...prev.bankAccount, bank: e.target.value },
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., Banco do Brasil, Itaú, etc."
             />
@@ -160,10 +190,12 @@ export function PaymentSettingsForm() {
             <input
               type="text"
               value={settings.bankAccount.agency}
-              onChange={(e) => setSettings(prev => ({ 
-                ...prev, 
-                bankAccount: { ...prev.bankAccount, agency: e.target.value }
-              }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  bankAccount: { ...prev.bankAccount, agency: e.target.value },
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Agency number"
             />
@@ -176,10 +208,12 @@ export function PaymentSettingsForm() {
             <input
               type="text"
               value={settings.bankAccount.account}
-              onChange={(e) => setSettings(prev => ({ 
-                ...prev, 
-                bankAccount: { ...prev.bankAccount, account: e.target.value }
-              }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  bankAccount: { ...prev.bankAccount, account: e.target.value },
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Account number"
             />
@@ -191,10 +225,15 @@ export function PaymentSettingsForm() {
             </label>
             <select
               value={settings.bankAccount.accountType}
-              onChange={(e) => setSettings(prev => ({ 
-                ...prev, 
-                bankAccount: { ...prev.bankAccount, accountType: e.target.value as 'checking' | 'savings' }
-              }))}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  bankAccount: {
+                    ...prev.bankAccount,
+                    accountType: e.target.value as 'checking' | 'savings',
+                  },
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="checking">Checking Account</option>
@@ -208,14 +247,20 @@ export function PaymentSettingsForm() {
       <div className="border-t pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900">Test Connection</h3>
+            <h3 className="text-lg font-medium text-gray-900">
+              Test Connection
+            </h3>
             <p className="text-sm text-gray-600">
               Verify that your EFI credentials are working correctly
             </p>
           </div>
           <button
             onClick={testConnection}
-            disabled={isTestingConnection || !settings.efiClientId || !settings.efiClientSecret}
+            disabled={
+              isTestingConnection ||
+              !settings.efiClientId ||
+              !settings.efiClientSecret
+            }
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isTestingConnection ? 'Testing...' : 'Test Connection'}
@@ -223,11 +268,13 @@ export function PaymentSettingsForm() {
         </div>
 
         {connectionStatus !== 'idle' && (
-          <div className={`mt-4 p-4 rounded-md ${
-            connectionStatus === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-red-50 border border-red-200 text-red-800'
-          }`}>
+          <div
+            className={`mt-4 p-4 rounded-md ${
+              connectionStatus === 'success'
+                ? 'bg-green-50 border border-green-200 text-green-800'
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}
+          >
             {connectionStatus === 'success' ? (
               <>
                 <strong>✅ Connection Successful!</strong>
@@ -259,13 +306,14 @@ export function PaymentSettingsForm() {
           📝 Environment Variables (.env.local)
         </h4>
         <pre className="text-xs bg-white p-3 rounded border overflow-x-auto">
-{`EFI_CLIENT_ID=${settings.efiClientId || 'your-efi-client-id'}
+          {`EFI_CLIENT_ID=${settings.efiClientId || 'your-efi-client-id'}
 EFI_CLIENT_SECRET=${settings.efiClientSecret || 'your-efi-client-secret'}
 EFI_ENVIRONMENT=${settings.efiEnvironment}
 EFI_WEBHOOK_SECRET=${settings.efiWebhookSecret || 'your-efi-webhook-secret'}`}
         </pre>
         <p className="text-xs text-gray-600 mt-2">
-          Copy these values to your .env.local file after testing the connection.
+          Copy these values to your .env.local file after testing the
+          connection.
         </p>
       </div>
     </div>

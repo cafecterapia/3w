@@ -76,11 +76,11 @@ export async function PUT(request: NextRequest) {
     // Update user billing information
     if (billingInfo) {
       const updateData: any = {};
-      
+
       if (billingInfo.name) updateData.name = billingInfo.name;
       if (billingInfo.email) updateData.email = billingInfo.email;
       if (billingInfo.cpf) updateData.cpf = billingInfo.cpf;
-      
+
       // TODO: Add phone and address fields to user schema
       // if (billingInfo.phone) updateData.phone = billingInfo.phone;
 
@@ -95,7 +95,11 @@ export async function PUT(request: NextRequest) {
     // TODO: Store payment settings in database
     // For now, we'll just acknowledge the update
     if (paymentSettings) {
-      console.log('Updating payment settings for user:', session.user.id, paymentSettings);
+      console.log(
+        'Updating payment settings for user:',
+        session.user.id,
+        paymentSettings
+      );
     }
 
     return NextResponse.json({

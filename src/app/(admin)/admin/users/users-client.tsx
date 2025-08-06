@@ -18,7 +18,19 @@ type Props = {
 
 function IconUsers() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="3" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -29,7 +41,19 @@ function IconUsers() {
 
 function IconSearch() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <circle cx="11" cy="11" r="7" />
       <path d="m21 21-3.6-3.6" />
     </svg>
@@ -38,15 +62,46 @@ function IconSearch() {
 
 function IconSort({ dir }: { dir: 'asc' | 'desc' | null }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round', opacity: dir ? 1 : 0.3 }}>
-      {dir === 'asc' ? <path d="m7 15 5-5 5 5" /> : dir === 'desc' ? <path d="m7 9 5 5 5-5" /> : <path d="M8 9h8M8 15h8" />}
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.8,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+        opacity: dir ? 1 : 0.3,
+      }}
+    >
+      {dir === 'asc' ? (
+        <path d="m7 15 5-5 5 5" />
+      ) : dir === 'desc' ? (
+        <path d="m7 9 5 5 5-5" />
+      ) : (
+        <path d="M8 9h8M8 15h8" />
+      )}
     </svg>
   );
 }
 
 function IconChevronRight() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.8,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <path d="m9 18 6-6-6-6" />
     </svg>
   );
@@ -69,7 +124,16 @@ function Pill({ label }: { label: string }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: 'currentColor', opacity: 0.9 }} />
+      <span
+        aria-hidden="true"
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: 999,
+          backgroundColor: 'currentColor',
+          opacity: 0.9,
+        }}
+      />
       {label}
     </span>
   );
@@ -87,9 +151,13 @@ function RolePill({ role }: { role: string }) {
         borderRadius: 999,
         fontSize: 12,
         fontWeight: 700,
-        backgroundColor: strong ? 'var(--color-gray-900)' : 'var(--color-gray-100)',
+        backgroundColor: strong
+          ? 'var(--color-gray-900)'
+          : 'var(--color-gray-100)',
         color: strong ? 'var(--color-secondary)' : 'var(--color-gray-800)',
-        border: strong ? '1px solid var(--color-gray-900)' : '1px solid var(--color-gray-200)',
+        border: strong
+          ? '1px solid var(--color-gray-900)'
+          : '1px solid var(--color-gray-200)',
         letterSpacing: 0.3,
       }}
       title={role}
@@ -100,14 +168,21 @@ function RolePill({ role }: { role: string }) {
 }
 
 type SortState = {
-  key: keyof Pick<User, 'name' | 'email' | 'role' | 'subscriptionStatus' | 'currentPeriodEnd'> | null;
+  key:
+    | keyof Pick<
+        User,
+        'name' | 'email' | 'role' | 'subscriptionStatus' | 'currentPeriodEnd'
+      >
+    | null;
   dir: 'asc' | 'desc' | null;
 };
 
 export default function UsersClient({ users }: Props) {
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'ADMIN' | 'USER'>('ALL');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'active' | 'canceled' | 'trialing' | 'past_due' | 'none'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<
+    'ALL' | 'active' | 'canceled' | 'trialing' | 'past_due' | 'none'
+  >('ALL');
   const [sort, setSort] = useState<SortState>({ key: null, dir: null });
   const [page, setPage] = useState(1);
   const pageSize = 12;
@@ -122,7 +197,8 @@ export default function UsersClient({ users }: Props) {
         (u.subscriptionStatus ?? '').toLowerCase().includes(q);
       const matchesRole = roleFilter === 'ALL' ? true : u.role === roleFilter;
       const normalized = u.subscriptionStatus ?? 'none';
-      const matchesStatus = statusFilter === 'ALL' ? true : normalized === statusFilter;
+      const matchesStatus =
+        statusFilter === 'ALL' ? true : normalized === statusFilter;
       return matchesQuery && matchesRole && matchesStatus;
     });
   }, [users, query, roleFilter, statusFilter]);
@@ -133,8 +209,18 @@ export default function UsersClient({ users }: Props) {
     copy.sort((a, b) => {
       const ak = a[sort.key!];
       const bk = b[sort.key!];
-      const av = ak === null || ak === undefined ? '' : typeof ak === 'string' ? ak.toLowerCase() : String(ak);
-      const bv = bk === null || bk === undefined ? '' : typeof bk === 'string' ? bk.toLowerCase() : String(bk);
+      const av =
+        ak === null || ak === undefined
+          ? ''
+          : typeof ak === 'string'
+            ? ak.toLowerCase()
+            : String(ak);
+      const bv =
+        bk === null || bk === undefined
+          ? ''
+          : typeof bk === 'string'
+            ? bk.toLowerCase()
+            : String(bk);
       if (av < bv) return sort.dir === 'asc' ? -1 : 1;
       if (av > bv) return sort.dir === 'asc' ? 1 : -1;
       return 0;
@@ -186,19 +272,31 @@ export default function UsersClient({ users }: Props) {
               display: 'grid',
               placeItems: 'center',
               color: 'var(--color-foreground)',
-              background: 'linear-gradient(180deg, var(--color-gray-50), transparent)',
+              background:
+                'linear-gradient(180deg, var(--color-gray-50), transparent)',
               border: '1px solid var(--color-gray-200)',
             }}
           >
             <IconUsers />
           </div>
           <div>
-            <h1 style={{ fontSize: 20, lineHeight: '24px', fontWeight: 700 }}>Users</h1>
-            <div style={{ fontSize: 12, color: 'var(--color-gray-600)' }}>Total: {users.length} users</div>
+            <h1 style={{ fontSize: 20, lineHeight: '24px', fontWeight: 700 }}>
+              Users
+            </h1>
+            <div style={{ fontSize: 12, color: 'var(--color-gray-600)' }}>
+              Total: {users.length} users
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           {/* Search */}
           <label
             className="group"
@@ -213,7 +311,14 @@ export default function UsersClient({ users }: Props) {
               minWidth: 240,
             }}
           >
-            <span aria-hidden="true" style={{ display: 'inline-grid', placeItems: 'center', color: 'var(--color-gray-600)' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                display: 'inline-grid',
+                placeItems: 'center',
+                color: 'var(--color-gray-600)',
+              }}
+            >
               <IconSearch />
             </span>
             <input
@@ -317,12 +422,40 @@ export default function UsersClient({ users }: Props) {
               }}
             >
               <tr>
-                <Th label="Name" onClick={() => toggleSort('name')} dir={sort.key === 'name' ? sort.dir : null} />
-                <Th label="Email" onClick={() => toggleSort('email')} dir={sort.key === 'email' ? sort.dir : null} />
-                <Th label="Role" onClick={() => toggleSort('role')} dir={sort.key === 'role' ? sort.dir : null} />
-                <Th label="Subscription Status" onClick={() => toggleSort('subscriptionStatus')} dir={sort.key === 'subscriptionStatus' ? sort.dir : null} />
-                <Th label="Current Period End" onClick={() => toggleSort('currentPeriodEnd')} dir={sort.key === 'currentPeriodEnd' ? sort.dir : null} />
-                <th style={{ textAlign: 'left', padding: '10px 16px', whiteSpace: 'nowrap' }}>Actions</th>
+                <Th
+                  label="Name"
+                  onClick={() => toggleSort('name')}
+                  dir={sort.key === 'name' ? sort.dir : null}
+                />
+                <Th
+                  label="Email"
+                  onClick={() => toggleSort('email')}
+                  dir={sort.key === 'email' ? sort.dir : null}
+                />
+                <Th
+                  label="Role"
+                  onClick={() => toggleSort('role')}
+                  dir={sort.key === 'role' ? sort.dir : null}
+                />
+                <Th
+                  label="Subscription Status"
+                  onClick={() => toggleSort('subscriptionStatus')}
+                  dir={sort.key === 'subscriptionStatus' ? sort.dir : null}
+                />
+                <Th
+                  label="Current Period End"
+                  onClick={() => toggleSort('currentPeriodEnd')}
+                  dir={sort.key === 'currentPeriodEnd' ? sort.dir : null}
+                />
+                <th
+                  style={{
+                    textAlign: 'left',
+                    padding: '10px 16px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -332,29 +465,57 @@ export default function UsersClient({ users }: Props) {
                   <tr
                     key={user.id}
                     style={{
-                      backgroundColor: zebra ? 'var(--color-gray-50)' : 'var(--color-card)',
+                      backgroundColor: zebra
+                        ? 'var(--color-gray-50)'
+                        : 'var(--color-card)',
                       borderBottom: '1px solid var(--color-border)',
                       transition: 'background-color 140ms ease',
                     }}
                     className="hover:bg-[color:var(--color-gray-100)]"
                   >
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      <div style={{ fontWeight: 600 }}>{user.name || 'N/A'}</div>
+                    <td
+                      style={{ padding: '12px 16px', verticalAlign: 'middle' }}
+                    >
+                      <div style={{ fontWeight: 600 }}>
+                        {user.name || 'N/A'}
+                      </div>
                     </td>
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td
+                      style={{ padding: '12px 16px', verticalAlign: 'middle' }}
+                    >
                       <div>{user.email}</div>
                     </td>
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td
+                      style={{ padding: '12px 16px', verticalAlign: 'middle' }}
+                    >
                       <RolePill role={user.role} />
                     </td>
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td
+                      style={{ padding: '12px 16px', verticalAlign: 'middle' }}
+                    >
                       <Pill label={user.subscriptionStatus || 'None'} />
                     </td>
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle', color: 'var(--color-foreground)' }}>
-                      {user.currentPeriodEnd ? new Date(user.currentPeriodEnd).toLocaleDateString() : 'N/A'}
+                    <td
+                      style={{
+                        padding: '12px 16px',
+                        verticalAlign: 'middle',
+                        color: 'var(--color-foreground)',
+                      }}
+                    >
+                      {user.currentPeriodEnd
+                        ? new Date(user.currentPeriodEnd).toLocaleDateString()
+                        : 'N/A'}
                     </td>
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <td
+                      style={{ padding: '12px 16px', verticalAlign: 'middle' }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: 8,
+                          alignItems: 'center',
+                        }}
+                      >
                         <a
                           href={`/admin/users/${user.id}`}
                           style={{
@@ -369,7 +530,8 @@ export default function UsersClient({ users }: Props) {
                             backgroundColor: 'var(--color-card)',
                             fontSize: 13,
                             fontWeight: 600,
-                            transition: 'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
+                            transition:
+                              'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
                           }}
                           className="hover:bg-[color:var(--color-gray-50)]"
                         >
@@ -394,7 +556,8 @@ export default function UsersClient({ users }: Props) {
                             fontSize: 13,
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
+                            transition:
+                              'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
                           }}
                           className="hover:bg-[color:var(--color-gray-50)]"
                         >
@@ -410,7 +573,13 @@ export default function UsersClient({ users }: Props) {
           </table>
 
           {sorted.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '48px 16px', color: 'var(--color-gray-600)' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '48px 16px',
+                color: 'var(--color-gray-600)',
+              }}
+            >
               No users match your filters.
             </div>
           )}
@@ -456,7 +625,11 @@ export default function UsersClient({ users }: Props) {
         @supports (backdrop-filter: blur(6px)) {
           header,
           section {
-            background-color: color-mix(in oklab, var(--color-card) 88%, transparent);
+            background-color: color-mix(
+              in oklab,
+              var(--color-card) 88%,
+              transparent
+            );
             backdrop-filter: saturate(160%) blur(6px);
           }
         }
@@ -465,7 +638,9 @@ export default function UsersClient({ users }: Props) {
         select:focus-visible,
         input:focus-visible {
           outline: none;
-          box-shadow: 0 0 0 2px var(--color-gray-300), 0 0 0 4px var(--color-gray-600);
+          box-shadow:
+            0 0 0 2px var(--color-gray-300),
+            0 0 0 4px var(--color-gray-600);
           border-radius: 8px;
         }
         th button {
@@ -521,6 +696,7 @@ function navBtnStyle(disabled: boolean): React.CSSProperties {
     fontWeight: 600,
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.6 : 1,
-    transition: 'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
+    transition:
+      'background-color 160ms ease, border-color 160ms ease, transform 120ms ease',
   };
 }

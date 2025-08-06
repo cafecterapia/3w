@@ -18,7 +18,10 @@ interface RegisterFormProps {
   } | null;
 }
 
-export default function RegisterForm({ registerAction, planDetails }: RegisterFormProps) {
+export default function RegisterForm({
+  registerAction,
+  planDetails,
+}: RegisterFormProps) {
   const [state, formAction, isPending] = useActionState(registerAction, {});
   const router = useRouter();
 
@@ -30,7 +33,9 @@ export default function RegisterForm({ registerAction, planDetails }: RegisterFo
           const paymentUrl = `/api/payments/create-class-subscription`;
           // In a real implementation, you would handle the payment flow here
           // For now, redirect to login with plan info
-          router.push(`/login?plan=${planDetails.classCount}&scheduling=${planDetails.schedulingOption}&price=${planDetails.totalPrice}`);
+          router.push(
+            `/login?plan=${planDetails.classCount}&scheduling=${planDetails.schedulingOption}&price=${planDetails.totalPrice}`
+          );
         } else {
           router.push('/login');
         }

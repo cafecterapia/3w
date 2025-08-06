@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       case 'cancel_subscription':
         // TODO: Implement subscription cancellation via EFI
         console.log('Cancelling subscription for user:', user.id);
-        
+
         // Update user status in database
         await prisma.user.update({
           where: { id: user.id },

@@ -222,11 +222,7 @@ export default function SettingsPage() {
                 <Button as={Link} href="/billing/invoices" variant="secondary">
                   Ver faturas
                 </Button>
-                <Button
-                  as={Link}
-                  href="/billing/manage"
-                  variant="ghost"
-                >
+                <Button as={Link} href="/billing/manage" variant="ghost">
                   Métodos de pagamento
                 </Button>
               </div>

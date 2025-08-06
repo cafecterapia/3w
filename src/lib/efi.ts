@@ -1,11 +1,16 @@
 // Efi SDK initialization and helper functions
 import EfiPay from 'sdk-node-apis-efi';
 import crypto from 'crypto';
+import path from 'path';
 
 const options = {
   client_id: process.env.EFI_CLIENT_ID!,
   client_secret: process.env.EFI_CLIENT_SECRET!,
   sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
+  certificate: process.env.EFI_CERTIFICATE_PATH
+    ? path.resolve(process.env.EFI_CERTIFICATE_PATH)
+    : undefined,
+  passphrase: process.env.EFI_CERTIFICATE_PASSWORD || '',
 };
 
 export const efiClient = new EfiPay(options);
@@ -114,18 +119,20 @@ export class EfiService {
         connected: true,
         environment: process.env.EFI_ENVIRONMENT,
         balance: response.saldo,
-        status: 'Active'
+        status: 'Active',
       };
     } catch (error) {
       console.error('EFI connection test error:', error);
-      throw new Error(`EFI connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `EFI connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   verifyWebhookSignature(payload: string, signature: string): boolean {
     try {
       // EFI webhook signature verification using HMAC-SHA256
-      
+
       // Get the webhook secret from environment variables
       const webhookSecret = process.env.EFI_WEBHOOK_SECRET;
       if (!webhookSecret) {
@@ -141,15 +148,15 @@ export class EfiService {
 
       // Compare the signatures using a constant-time comparison to prevent timing attacks
       const receivedSignature = signature.replace('sha256=', '');
-      
+
       // Use timingSafeEqual for secure comparison
       const expectedBuffer = Buffer.from(expectedSignature, 'hex');
       const receivedBuffer = Buffer.from(receivedSignature, 'hex');
-      
+
       if (expectedBuffer.length !== receivedBuffer.length) {
         return false;
       }
-      
+
       return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
     } catch (error) {
       console.error('Error verifying webhook signature:', error);
@@ -159,4 +166,5 @@ export class EfiService {
 }
 
 export const efiService = new EfiService();
+export const efi = efiClient; // Export the raw EfiPay client for direct API access
 export default efiService;

@@ -1,39 +1,40 @@
 // src/__tests__/data.test.ts
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getDashboardData } from '../lib/data';
-
-// Mock Prisma
-vi.mock('../lib/prisma', () => ({
-  default: {
-    user: {
-      findUnique: vi.fn(),
-    },
-  },
-}));
-
 import prisma from '../lib/prisma';
 
 describe('getDashboardData', () => {
+  let testUserId: string;
+
+  beforeEach(async () => {
+    // Create a test user with subscription
+    const testUser = await prisma.user.create({
+      data: {
+        name: 'Test User',
+        email: `test-${Date.now()}@example.com`,
+        password: 'hashed_password',
+        cpf: '11144477735',
+        role: 'USER',
+        efiSubscriptionId: 'sub_123',
+        subscriptionStatus: 'active',
+        currentPeriodEnd: new Date('2025-09-01'),
+        paymentCreatedAt: new Date(),
+      },
+    });
+    testUserId = testUser.id;
+  });
+
+  afterEach(async () => {
+    // Clean up test data
+    if (testUserId) {
+      await prisma.user.delete({
+        where: { id: testUserId },
+      });
+    }
+  });
+
   it('should return subscription data for user with active subscription', async () => {
-    // Mock the database response
-    const mockUser = {
-      id: 'user_123',
-      name: 'Test User',
-      email: 'test@example.com',
-      emailVerified: null,
-      image: null,
-      password: 'hashed_password',
-      cpf: '11144477735',
-      role: 'USER' as const,
-      efiSubscriptionId: 'sub_123',
-      subscriptionStatus: 'active',
-      currentPeriodEnd: new Date('2025-09-01'),
-      pushSubscription: null,
-    };
-
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-
-    const result = await getDashboardData('user_123');
+    const result = await getDashboardData(testUserId);
 
     expect(result.subscription).toEqual({
       id: 'sub_123',
@@ -48,28 +49,29 @@ describe('getDashboardData', () => {
   });
 
   it('should return null subscription for user without subscription', async () => {
-    // Mock user without subscription
-    const mockUser = {
-      id: 'user_456',
-      name: 'Test User 2',
-      email: 'test2@example.com',
-      emailVerified: null,
-      image: null,
-      password: 'hashed_password',
-      cpf: null,
-      role: 'USER' as const,
-      efiSubscriptionId: null,
-      subscriptionStatus: null,
-      currentPeriodEnd: null,
-      pushSubscription: null,
-    };
+    // Create another test user without subscription
+    const userWithoutSub = await prisma.user.create({
+      data: {
+        name: 'Test User 2',
+        email: `test-no-sub-${Date.now()}@example.com`,
+        password: 'hashed_password',
+        role: 'USER',
+        efiSubscriptionId: null,
+        subscriptionStatus: null,
+        currentPeriodEnd: null,
+        paymentCreatedAt: null,
+      },
+    });
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-
-    const result = await getDashboardData('user_456');
+    const result = await getDashboardData(userWithoutSub.id);
 
     expect(result.subscription).toBeNull();
     expect(result.invoices).toHaveLength(0);
     expect(result.notices).toHaveLength(2);
+
+    // Clean up
+    await prisma.user.delete({
+      where: { id: userWithoutSub.id },
+    });
   });
 });

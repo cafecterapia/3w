@@ -16,7 +16,19 @@ type Props = {
 /* Monochrome, pixel-hinted icons (currentColor) */
 function IconUsers() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="3" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -27,7 +39,19 @@ function IconUsers() {
 
 function IconAdmin() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <path d="m9 12 2 2 4-4" />
       <path d="M20.618 7.984A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z" />
     </svg>
@@ -36,7 +60,19 @@ function IconAdmin() {
 
 function IconRegular() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <circle cx="12" cy="7" r="4" />
       <path d="M5 21a7 7 0 0 1 14 0" />
     </svg>
@@ -45,7 +81,19 @@ function IconRegular() {
 
 function IconSubscription() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style={{ strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+      style={{
+        strokeWidth: 1.6,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      }}
+    >
       <path d="m9 12 2 2 4-4" />
       <circle cx="12" cy="12" r="9" />
     </svg>
@@ -78,7 +126,8 @@ function StatTile({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        transition: 'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
+        transition:
+          'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease',
       }}
     >
       <div
@@ -90,19 +139,43 @@ function StatTile({
           display: 'grid',
           placeItems: 'center',
           color: 'var(--color-foreground)',
-          background: 'linear-gradient(180deg, var(--color-gray-50), transparent)',
+          background:
+            'linear-gradient(180deg, var(--color-gray-50), transparent)',
           border: '1px solid var(--color-gray-200)',
         }}
       >
         {icon}
       </div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 13, color: 'var(--color-gray-600)', fontWeight: 500 }} className="truncate">
+        <div
+          style={{
+            fontSize: 13,
+            color: 'var(--color-gray-600)',
+            fontWeight: 500,
+          }}
+          className="truncate"
+        >
           {title}
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--color-foreground)' }}>{value}</div>
+        <div
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: 'var(--color-foreground)',
+          }}
+        >
+          {value}
+        </div>
         {hint ? (
-          <div style={{ marginTop: 4, fontSize: 12, color: 'var(--color-gray-500)' }}>{hint}</div>
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 12,
+              color: 'var(--color-gray-500)',
+            }}
+          >
+            {hint}
+          </div>
         ) : null}
       </div>
     </div>
@@ -130,7 +203,14 @@ function Ring({ percent, label }: { percent: number; label: string }) {
     >
       <svg width="110" height="110" viewBox="0 0 110 110" aria-hidden="true">
         <g transform="translate(55,55) rotate(-90)">
-          <circle cx="0" cy="0" r={r} fill="none" stroke="var(--color-gray-200)" strokeWidth="10" />
+          <circle
+            cx="0"
+            cy="0"
+            r={r}
+            fill="none"
+            stroke="var(--color-gray-200)"
+            strokeWidth="10"
+          />
           <circle
             cx="0"
             cy="0"
@@ -144,8 +224,18 @@ function Ring({ percent, label }: { percent: number; label: string }) {
         </g>
       </svg>
       <div>
-        <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-foreground)' }}>{p}%</div>
-        <div style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>{label}</div>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            color: 'var(--color-foreground)',
+          }}
+        >
+          {p}%
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>
+          {label}
+        </div>
       </div>
     </div>
   );
@@ -163,8 +253,23 @@ function BarRow({
   const p = Math.max(0, Math.min(100, percent));
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
-        <span style={{ fontSize: 13, color: 'var(--color-gray-700)', fontWeight: 500 }}>{label}</span>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 8,
+          marginBottom: 6,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            color: 'var(--color-gray-700)',
+            fontWeight: 500,
+          }}
+        >
+          {label}
+        </span>
         <span style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>
           {value} • {p.toFixed(1)}%
         </span>
@@ -183,7 +288,8 @@ function BarRow({
           style={{
             width: `${p}%`,
             height: '100%',
-            background: 'linear-gradient(90deg, var(--color-gray-800), var(--color-gray-700))',
+            background:
+              'linear-gradient(90deg, var(--color-gray-800), var(--color-gray-700))',
           }}
         />
       </div>
@@ -201,9 +307,11 @@ export default function AnalyticsClient({ data }: Props) {
     usersWithSubscriptions,
   } = data;
 
-  const conversionRate = totalUsers > 0 ? (usersWithSubscriptions / totalUsers) * 100 : 0;
+  const conversionRate =
+    totalUsers > 0 ? (usersWithSubscriptions / totalUsers) * 100 : 0;
   const adminPercentage = totalUsers > 0 ? (adminUsers / totalUsers) * 100 : 0;
-  const regularPercentage = totalUsers > 0 ? (regularUsers / totalUsers) * 100 : 0;
+  const regularPercentage =
+    totalUsers > 0 ? (regularUsers / totalUsers) * 100 : 0;
 
   return (
     <div style={{ color: 'var(--color-foreground)' }}>
@@ -217,10 +325,20 @@ export default function AnalyticsClient({ data }: Props) {
           gap: 12,
         }}
       >
-        <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: -0.1, color: 'var(--color-foreground)' }}>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            letterSpacing: -0.1,
+            color: 'var(--color-foreground)',
+          }}
+        >
           Analytics
         </h1>
-        <div style={{ fontSize: 12, color: 'var(--color-gray-600)' }} aria-live="polite">
+        <div
+          style={{ fontSize: 12, color: 'var(--color-gray-600)' }}
+          aria-live="polite"
+        >
           Last updated: {new Date().toLocaleDateString()}
         </div>
       </header>
@@ -234,13 +352,25 @@ export default function AnalyticsClient({ data }: Props) {
       >
         <div className="md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4">
           <div className="mb-4 md:mb-0">
-            <StatTile title="Total Users" value={totalUsers} icon={<IconUsers />} />
+            <StatTile
+              title="Total Users"
+              value={totalUsers}
+              icon={<IconUsers />}
+            />
           </div>
           <div className="mb-4 md:mb-0">
-            <StatTile title="Admin Users" value={adminUsers} icon={<IconAdmin />} />
+            <StatTile
+              title="Admin Users"
+              value={adminUsers}
+              icon={<IconAdmin />}
+            />
           </div>
           <div className="mb-4 md:mb-0">
-            <StatTile title="Regular Users" value={regularUsers} icon={<IconRegular />} />
+            <StatTile
+              title="Regular Users"
+              value={regularUsers}
+              icon={<IconRegular />}
+            />
           </div>
           <div>
             <StatTile
@@ -253,7 +383,10 @@ export default function AnalyticsClient({ data }: Props) {
       </section>
 
       {/* Insights */}
-      <section className="grid gap-4" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+      <section
+        className="grid gap-4"
+        style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}
+      >
         {/* Conversion ring + quick stats */}
         <div
           style={{
@@ -266,31 +399,91 @@ export default function AnalyticsClient({ data }: Props) {
             gap: 16,
           }}
         >
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-foreground)' }}>
+          <h2
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'var(--color-foreground)',
+            }}
+          >
             Subscription Overview
           </h2>
 
-          <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr)', gap: 16 }}>
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: 'minmax(0, 1fr)', gap: 16 }}
+          >
             <div className="sm:grid sm:grid-cols-[auto,1fr] sm:gap-16">
-              <Ring percent={conversionRate} label="Conversion rate (users with subscriptions)" />
+              <Ring
+                percent={conversionRate}
+                label="Conversion rate (users with subscriptions)"
+              />
 
               <div className="grid gap-10 mt-6 sm:mt-0">
                 <div className="grid gap-4">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>Active</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-foreground)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 13, color: 'var(--color-gray-600)' }}
+                    >
+                      Active
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--color-foreground)',
+                      }}
+                    >
                       {activeSubscriptions}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>Canceled</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-foreground)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 13, color: 'var(--color-gray-600)' }}
+                    >
+                      Canceled
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--color-foreground)',
+                      }}
+                    >
                       {canceledSubscriptions}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, color: 'var(--color-gray-600)' }}>Total with subscriptions</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-foreground)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 13, color: 'var(--color-gray-600)' }}
+                    >
+                      Total with subscriptions
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--color-foreground)',
+                      }}
+                    >
                       {usersWithSubscriptions}
                     </span>
                   </div>
@@ -308,7 +501,13 @@ export default function AnalyticsClient({ data }: Props) {
                     fontSize: 12,
                   }}
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
                     <span
                       style={{
                         width: 10,
@@ -320,7 +519,13 @@ export default function AnalyticsClient({ data }: Props) {
                     />
                     Converted
                   </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
                     <span
                       style={{
                         width: 10,
@@ -350,9 +555,25 @@ export default function AnalyticsClient({ data }: Props) {
             gap: 14,
           }}
         >
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-foreground)' }}>User Distribution</h2>
-          <BarRow label="Admin Users" value={adminUsers} percent={adminPercentage} />
-          <BarRow label="Regular Users" value={regularUsers} percent={regularPercentage} />
+          <h2
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'var(--color-foreground)',
+            }}
+          >
+            User Distribution
+          </h2>
+          <BarRow
+            label="Admin Users"
+            value={adminUsers}
+            percent={adminPercentage}
+          />
+          <BarRow
+            label="Regular Users"
+            value={regularUsers}
+            percent={regularPercentage}
+          />
         </div>
       </section>
 
@@ -361,7 +582,11 @@ export default function AnalyticsClient({ data }: Props) {
           section > div,
           .group,
           .ring {
-            background-color: color-mix(in oklab, var(--color-card) 88%, transparent);
+            background-color: color-mix(
+              in oklab,
+              var(--color-card) 88%,
+              transparent
+            );
             backdrop-filter: saturate(160%) blur(6px);
           }
         }
@@ -374,7 +599,9 @@ export default function AnalyticsClient({ data }: Props) {
         button:focus-visible,
         [role='region']:focus-visible {
           outline: none;
-          box-shadow: 0 0 0 2px var(--color-gray-300), 0 0 0 4px var(--color-gray-600);
+          box-shadow:
+            0 0 0 2px var(--color-gray-300),
+            0 0 0 4px var(--color-gray-600);
           border-radius: 8px;
         }
         @media (min-width: 768px) {

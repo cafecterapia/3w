@@ -27,7 +27,7 @@ export default async function UsersPage() {
   });
 
   // Filter out users without email (shouldn't happen but just in case)
-  const validUsers = users.filter(user => user.email !== null) as Array<{
+  const validUsers = users.filter((user) => user.email !== null) as Array<{
     id: string;
     name: string | null;
     email: string;
