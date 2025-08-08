@@ -73,7 +73,11 @@ export default async function DashboardPage() {
                 <div>
                   <CardTitle>Assinatura</CardTitle>
                   <p className="mt-1 text-sm text-accent">
-                    {subscription?.type === 'mensal' ? 'Mensal' : subscription?.type === 'avulsa' ? 'Avulsa' : 'Nenhuma assinatura ativa'}
+                    {subscription?.type === 'mensal'
+                      ? 'Mensal'
+                      : subscription?.type === 'avulsa'
+                        ? 'Avulsa'
+                        : 'Nenhuma assinatura ativa'}
                   </p>
                 </div>
                 {/* We pass the status, or a default string if no subscription */}
@@ -81,7 +85,8 @@ export default async function DashboardPage() {
               </div>
               <div className="mt-4">
                 <p className="text-lg font-semibold">
-                  {subscription?.creditsRemaining || 0} de {subscription?.totalCredits || 0} aulas restantes
+                  {subscription?.creditsRemaining || 0} de{' '}
+                  {subscription?.totalCredits || 0} aulas restantes
                 </p>
                 <Link
                   href="/billing/manage"

@@ -2,6 +2,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { getBillingOverview, getInvoices } from '@/lib/billing';
 
 export const metadata: Metadata = {
   title: 'Faturamento — Portal do Aluno',
@@ -44,50 +47,41 @@ function SuccessMessage({
 }
 
 interface BillingPageProps {
-  searchParams: { success?: string };
+  searchParams: Promise<{ success?: string }>;
 }
 
-export default function BillingPage({ searchParams }: BillingPageProps) {
-  // Replace with real data from your billing provider
-  const plan = {
-    name: 'Plano Premium',
-    description: '10.000 requisições/mês',
-    price: 'R$ 29,99',
-    cadence: 'por mês',
-    status: 'Ativa',
-    renewal: '15 Mar 2025',
+export default async function BillingPage({ searchParams }: BillingPageProps) {
+  const session = await auth();
+  if (!session?.user?.id) redirect('/login');
+
+  const { success } = await searchParams;
+
+  const overview = await getBillingOverview(session.user.id);
+  const history = await getInvoices(session.user.id);
+
+  const plan = overview?.plan ?? {
+    name: 'Sem plano ativo',
+    description: 'Escolha um plano para começar',
+    price: '-',
+    cadence: '-',
+    status: 'Inativa',
+    renewal: '-',
   };
 
-  const history = [
-    {
-      id: 'inv_003',
-      month: 'Fevereiro 2025',
-      plan: 'Premium',
-      amount: 'R$ 29,99',
-      status: 'Pago',
-    },
-    {
-      id: 'inv_002',
-      month: 'Janeiro 2025',
-      plan: 'Premium',
-      amount: 'R$ 29,99',
-      status: 'Pago',
-    },
-    {
-      id: 'inv_001',
-      month: 'Dezembro 2024',
-      plan: 'Premium',
-      amount: 'R$ 29,99',
-      status: 'Pago',
-    },
-  ];
+  // Decide primary actions
+  const isPendingOrInactive =
+    overview?.status === 'pending' || overview?.status === 'inactive';
+  const hasTxid = Boolean(overview?.txid);
+  const continuePaymentHref = hasTxid
+    ? `/billing/pay?txid=${overview?.txid}`
+    : '/billing/plan';
 
   return (
     <main className="min-h-dvh bg-background text-foreground">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Success Message */}
         <Suspense fallback={null}>
-          <SuccessMessage searchParams={searchParams} />
+          <SuccessMessage searchParams={{ success }} />
         </Suspense>
 
         {/* Header */}
@@ -132,9 +126,15 @@ export default function BillingPage({ searchParams }: BillingPageProps) {
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <ActionButton href="/billing/manage">
-                Gerenciar pagamentos
-              </ActionButton>
+              {isPendingOrInactive ? (
+                <ActionButton href={continuePaymentHref}>
+                  {hasTxid ? 'Continuar pagamento' : 'Iniciar pagamento'}
+                </ActionButton>
+              ) : (
+                <ActionButton href="/billing/plan">
+                  Atualizar plano
+                </ActionButton>
+              )}
               <ActionButton href="/billing/invoices" variant="secondary">
                 Ver faturas
               </ActionButton>
@@ -162,15 +162,36 @@ export default function BillingPage({ searchParams }: BillingPageProps) {
             <dl className="mt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-accent">Status</dt>
-                <dd>Ativa</dd>
+                <dd>
+                  {overview?.status === 'active'
+                    ? 'Ativa'
+                    : overview?.status === 'pending'
+                      ? 'Pendente'
+                      : 'Inativa'}
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-accent">Próxima cobrança</dt>
-                <dd>{plan.renewal}</dd>
+                <dd>
+                  {overview?.nextChargeAt
+                    ? new Intl.DateTimeFormat('pt-BR', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      }).format(new Date(overview.nextChargeAt))
+                    : '-'}
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-accent">Valor</dt>
-                <dd>{plan.price}</dd>
+                <dd>
+                  {overview?.amountCents
+                    ? new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(overview.amountCents / 100)
+                    : '-'}
+                </dd>
               </div>
             </dl>
             <div className="mt-6">
@@ -198,33 +219,37 @@ export default function BillingPage({ searchParams }: BillingPageProps) {
           <div className="mt-4 overflow-hidden rounded-lg border border-border">
             <table className="w-full border-collapse text-sm">
               <thead className="bg-secondary">
-                <tr className="text-left">
-                  <Th>Data</Th>
-                  <Th>Plano</Th>
-                  <Th>Valor</Th>
-                  <Th>Status</Th>
-                  <Th className="text-right">Ação</Th>
+                <tr>
+                  <th className="px-4 py-3 text-left font-medium text-accent">
+                    Mês
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-accent">
+                    Plano
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-accent">
+                    Valor
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-accent">
+                    Status
+                  </th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
-                {history.map((row) => (
-                  <tr key={row.id} className="hover:bg-muted/60">
-                    <Td>{row.month}</Td>
-                    <Td>{row.plan}</Td>
-                    <Td>{row.amount}</Td>
-                    <Td>
-                      <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs">
-                        {row.status}
-                      </span>
-                    </Td>
-                    <Td className="text-right">
+              <tbody>
+                {history.map((item) => (
+                  <tr key={item.id} className="border-t border-border">
+                    <td className="px-4 py-3 capitalize">{item.month}</td>
+                    <td className="px-4 py-3">{item.plan}</td>
+                    <td className="px-4 py-3">{item.amount}</td>
+                    <td className="px-4 py-3">{item.status}</td>
+                    <td className="px-4 py-3 text-right">
                       <Link
-                        href={`/billing/invoices/${row.id}`}
-                        className="text-foreground hover:underline underline-offset-4"
+                        href={`/billing/invoices/${item.id}`}
+                        className="text-accent hover:underline underline-offset-4"
                       >
-                        Baixar PDF
+                        Ver fatura
                       </Link>
-                    </Td>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -236,7 +261,6 @@ export default function BillingPage({ searchParams }: BillingPageProps) {
   );
 }
 
-/* Primitives */
 function ActionButton({
   href,
   children,
@@ -246,44 +270,18 @@ function ActionButton({
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'ghost';
 }) {
-  const base =
-    'inline-flex w-full items-center justify-center rounded-md px-4 py-2 text-sm transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30';
-  const styles =
-    variant === 'primary'
-      ? 'bg-primary text-secondary hover:opacity-90'
-      : variant === 'secondary'
-        ? 'border border-border bg-secondary hover:bg-muted'
-        : 'text-foreground hover:underline underline-offset-4';
+  const classes = {
+    primary:
+      'inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-secondary hover:opacity-90',
+    secondary:
+      'inline-flex items-center justify-center rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary/80',
+    ghost:
+      'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium hover:bg-secondary',
+  }[variant];
+
   return (
-    <Link href={href} className={`${base} ${styles}`}>
+    <Link href={href} className={classes}>
       {children}
     </Link>
   );
-}
-
-function Th({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <th
-      scope="col"
-      className={`px-4 py-3 text-xs font-medium text-accent ${className}`}
-    >
-      {children}
-    </th>
-  );
-}
-
-function Td({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <td className={`px-4 py-3 align-middle ${className}`}>{children}</td>;
 }

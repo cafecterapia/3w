@@ -2,7 +2,24 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Server external packages (moved from experimental)
-  serverExternalPackages: ['@prisma/client', 'prisma'],
+  serverExternalPackages: ['@prisma/client', 'prisma', 'sdk-node-apis-efi'],
+
+  // Force dynamic rendering to avoid static generation issues
+  trailingSlash: false,
+  skipTrailingSlashRedirect: true,
+  
+  // Webpack configuration to handle server-only packages
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
+    }
+    return config;
+  },
 
   // PWA Configuration
   generateBuildId: async () => {

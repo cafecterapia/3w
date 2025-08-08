@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+} from 'react';
 
 interface PaymentMethod {
   id: string;
@@ -113,67 +119,76 @@ export function PaymentManagementProvider({
   const [error, setError] = useState<string | null>(null);
 
   // Mock data - replace with real API calls
-  const mockPaymentMethods: PaymentMethod[] = [
-    {
-      id: 'pm_1',
-      type: 'card',
-      brand: 'visa',
-      last4: '4242',
-      expiryMonth: 12,
-      expiryYear: 2026,
-      isDefault: true,
-      isActive: true,
-      createdAt: new Date('2024-01-15'),
-    },
-    {
-      id: 'pm_2',
-      type: 'card',
-      brand: 'mastercard',
-      last4: '1234',
-      expiryMonth: 8,
-      expiryYear: 2025,
-      isDefault: false,
-      isActive: false, // Expired
-      createdAt: new Date('2023-08-10'),
-    },
-  ];
+  const mockPaymentMethods = useMemo<PaymentMethod[]>(
+    () => [
+      {
+        id: 'pm_1',
+        type: 'card',
+        brand: 'visa',
+        last4: '4242',
+        expiryMonth: 12,
+        expiryYear: 2026,
+        isDefault: true,
+        isActive: true,
+        createdAt: new Date('2024-01-15'),
+      },
+      {
+        id: 'pm_2',
+        type: 'card',
+        brand: 'mastercard',
+        last4: '1234',
+        expiryMonth: 8,
+        expiryYear: 2025,
+        isDefault: false,
+        isActive: false, // Expired
+        createdAt: new Date('2023-08-10'),
+      },
+    ],
+    []
+  );
 
-  const mockBillingInfo: BillingInfo = {
-    name: 'João Silva',
-    email: 'joao@example.com',
-    cpf: '000.000.000-00',
-    phone: '(11) 99999-9999',
-  };
+  const mockBillingInfo = useMemo<BillingInfo>(
+    () => ({
+      name: 'João Silva',
+      email: 'joao@example.com',
+      cpf: '000.000.000-00',
+      phone: '(11) 99999-9999',
+    }),
+    []
+  );
 
-  const mockPaymentHistory: PaymentHistory[] = [
-    {
-      id: 'inv_003',
-      amount: 2999,
-      currency: 'BRL',
-      status: 'paid',
-      description: 'Plano Premium - Fevereiro 2025',
-      date: new Date('2025-02-01'),
-      paymentMethodId: 'pm_1',
-    },
-    {
-      id: 'inv_002',
-      amount: 2999,
-      currency: 'BRL',
-      status: 'paid',
-      description: 'Plano Premium - Janeiro 2025',
-      date: new Date('2025-01-01'),
-      paymentMethodId: 'pm_1',
-    },
-    {
-      id: 'inv_001',
-      amount: 2999,
-      currency: 'BRL',
-      status: 'paid',
-      description: 'Plano Premium - Dezembro 2024',
-      date: new Date('2024-12-01'),
-      paymentMethodId: 'pm_1',
-    },
-  ];
+  const mockPaymentHistory = useMemo<PaymentHistory[]>(
+    () => [
+      {
+        id: 'inv_003',
+        amount: 2999,
+        currency: 'BRL',
+        status: 'paid',
+        description: 'Plano Premium - Fevereiro 2025',
+        date: new Date('2025-02-01'),
+        paymentMethodId: 'pm_1',
+      },
+      {
+        id: 'inv_002',
+        amount: 2999,
+        currency: 'BRL',
+        status: 'paid',
+        description: 'Plano Premium - Janeiro 2025',
+        date: new Date('2025-01-01'),
+        paymentMethodId: 'pm_1',
+      },
+      {
+        id: 'inv_001',
+        amount: 2999,
+        currency: 'BRL',
+        status: 'paid',
+        description: 'Plano Premium - Dezembro 2024',
+        date: new Date('2024-12-01'),
+        paymentMethodId: 'pm_1',
+      },
+    ],
+    []
+  );
 
   // Load initial data
   useEffect(() => {
@@ -198,7 +213,7 @@ export function PaymentManagementProvider({
     };
 
     loadData();
-  }, [userId]);
+  }, [userId, mockPaymentMethods, mockBillingInfo, mockPaymentHistory]);
 
   // Actions
   const addPaymentMethod = async (

@@ -43,7 +43,11 @@ export function startOfCalendar(d: Date) {
 }
 
 export function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 export function key(d: Date) {
@@ -51,7 +55,10 @@ export function key(d: Date) {
 }
 
 export function fmtTime(d: Date) {
-  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(d);
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d);
 }
 
 export function durationLabel(s: { start: Date; end: Date }) {
@@ -59,7 +66,10 @@ export function durationLabel(s: { start: Date; end: Date }) {
   return `${mins} min`;
 }
 
-export function filterSlots<T extends { start: Date }>(list: T[], q: string): T[] {
+export function filterSlots<T extends { start: Date }>(
+  list: T[],
+  q: string
+): T[] {
   if (!q.trim()) return list;
   const L = q.toLowerCase();
   return list.filter((s) => fmtTime(s.start).toLowerCase().includes(L));

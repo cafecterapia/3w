@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
@@ -12,21 +12,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Handle successful credential verification
-  useEffect(() => {
-    if (state.message === 'login-success') {
-      handleNextAuthSignIn();
-    }
-  }, [state.message]);
-
-  async function handleNextAuthSignIn() {
+  const handleNextAuthSignIn = useCallback(async () => {
     try {
       // Get the form data
-      const formData = new FormData(
-        document.querySelector('form') as HTMLFormElement
-      );
-      const email = formData.get('email') as string;
-      const password = formData.get('password') as string;
+      const form = document.querySelector('form') as HTMLFormElement | null;
+      const formData = new FormData(form ?? undefined);
+      const email = (formData.get('email') as string) || '';
+      const password = (formData.get('password') as string) || '';
 
       // Now use NextAuth to actually sign in
       const result = await signIn('credentials', {
@@ -56,7 +48,14 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [router]);
+
+  // Handle successful credential verification
+  useEffect(() => {
+    if (state.message === 'login-success') {
+      handleNextAuthSignIn();
+    }
+  }, [state.message, handleNextAuthSignIn]);
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);

@@ -9,16 +9,18 @@ export const metadata: Metadata = {
 };
 
 interface PaymentPageProps {
-  searchParams: {
+  // searchParams is async in recent Next.js versions
+  searchParams: Promise<{
     txid?: string;
-  };
+  }>;
 }
 
 export default async function PaymentPage({ searchParams }: PaymentPageProps) {
   const session = await auth();
   if (!session) redirect('/login');
 
-  const { txid } = searchParams;
+  // Await searchParams before using its properties
+  const { txid } = await searchParams;
 
   if (!txid) {
     redirect('/billing');

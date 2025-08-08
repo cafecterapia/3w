@@ -2,15 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import webpush from 'web-push';
 import prisma from '@/lib/prisma';
 
-// Configure web-push
-webpush.setVapidDetails(
-  process.env.VAPID_EMAIL || 'mailto:test@example.com',
-  process.env.VAPID_PUBLIC_KEY || '',
-  process.env.VAPID_PRIVATE_KEY || ''
-);
+function normalizeVapidSubject(input?: string | null): string {
+  if (!input) return 'mailto:test@example.com';
+  const trimmed = input.trim();
+  if (trimmed.startsWith('mailto:')) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // Looks like a plain email → prefix with mailto:
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) return `mailto:${trimmed}`;
+  return 'mailto:test@example.com';
+}
+
+function configureWebPush() {
+  const subject = normalizeVapidSubject(
+    process.env.VAPID_SUBJECT || process.env.VAPID_EMAIL || null
+  );
+  const publicKey = process.env.VAPID_PUBLIC_KEY || '';
+  const privateKey = process.env.VAPID_PRIVATE_KEY || '';
+  webpush.setVapidDetails(subject, publicKey, privateKey);
+}
 
 export async function POST(request: NextRequest) {
   try {
+    configureWebPush();
+
     // Basic authentication check - you might want to implement API key validation
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

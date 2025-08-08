@@ -57,7 +57,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Handle temporary transaction IDs (profile completion needed)
-    if (txid.startsWith('temp_') && user.subscriptionStatus === 'PENDING_PROFILE') {
+    if (
+      txid.startsWith('temp_') &&
+      user.subscriptionStatus === 'PENDING_PROFILE'
+    ) {
       return NextResponse.json({
         success: true,
         status: 'pending_profile',
@@ -74,7 +77,7 @@ export async function GET(request: NextRequest) {
         status: 'cancelled',
         paymentData: null,
         subscriptionStatus: null,
-        message: 'Payment was cancelled.'
+        message: 'Payment was cancelled.',
       });
     }
 

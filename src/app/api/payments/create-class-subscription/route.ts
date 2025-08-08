@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     if (!user.name || !user.cpf) {
       // Generate a temporary transaction ID for the payment flow
       const tempTxid = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Store the payment intent in the database so we can retrieve it later
       await prisma.user.update({
         where: { id: user.id },
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
           paymentCreatedAt: new Date(),
         },
       });
-      
+
       return NextResponse.json({
         success: true,
         paymentConfirmationUrl: `/billing/pay?txid=${tempTxid}`,
@@ -133,26 +133,36 @@ export async function POST(request: NextRequest) {
       efiResponse = await efi.pixCreateImmediateCharge({}, chargePayload);
     } catch (efiError) {
       console.error('EFI API Error:', efiError);
-      
+
       // Check if it's an authentication error
       if ((efiError as any)?.response?.status === 401) {
         return NextResponse.json(
-          { success: false, message: 'Payment system authentication failed. Please contact support.' },
+          {
+            success: false,
+            message:
+              'Payment system authentication failed. Please contact support.',
+          },
           { status: 503 }
         );
       }
-      
+
       // Check if it's a validation error
       if ((efiError as any)?.response?.status === 400) {
-        const errorMessage = (efiError as any)?.response?.data?.mensagem || 'Invalid payment data';
+        const errorMessage =
+          (efiError as any)?.response?.data?.mensagem || 'Invalid payment data';
         return NextResponse.json(
-          { success: false, message: `Payment validation error: ${errorMessage}` },
+          {
+            success: false,
+            message: `Payment validation error: ${errorMessage}`,
+          },
           { status: 400 }
         );
       }
-      
+
       // Generic error
-      const errorMessage = (efiError as any)?.response?.data?.mensagem || 'Payment system temporarily unavailable';
+      const errorMessage =
+        (efiError as any)?.response?.data?.mensagem ||
+        'Payment system temporarily unavailable';
       return NextResponse.json(
         { success: false, message: errorMessage },
         { status: 503 }
@@ -181,14 +191,15 @@ export async function POST(request: NextRequest) {
       });
     } catch (qrError) {
       console.error('QR Code generation error:', qrError);
-      
+
       // If QR code generation fails, we can still proceed with the payment
       // The user can try refreshing the page or the QR code can be regenerated later
       return NextResponse.json({
         success: true,
         paymentData: null, // No QR code data
         paymentConfirmationUrl: `/billing/pay?txid=${efiResponse.txid}`,
-        message: 'Payment created but QR code generation failed. Please refresh the page.',
+        message:
+          'Payment created but QR code generation failed. Please refresh the page.',
       });
     }
 

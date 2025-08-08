@@ -40,3 +40,72 @@
     font-family: var(--font-sans);
   }
 }
+
+/* Immediate, global styling for input range used by PricingWidget */
+@layer components {
+  input[type='range'].range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent; /* gradient is applied inline for fill */
+    accent-color: var(--color-gray-900);
+  }
+
+  /* WebKit (Chrome, Safari, iOS) */
+  input[type='range'].range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    border: 2px solid var(--color-gray-900);
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+  input[type='range'].range-slider::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    height: 19px; /* matches h-1 */
+    border-radius: 9999px;
+    background: transparent;
+    border: none;
+  }
+
+  /* Firefox */
+  input[type='range'].range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    border: 2px solid var(--color-gray-900);
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+  input[type='range'].range-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: transparent;
+    border: none;
+  }
+
+  /* Edge/IE */
+  input[type='range'].range-slider::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    border: 2px solid var(--color-gray-900);
+    cursor: pointer;
+  }
+  input[type='range'].range-slider::-ms-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type='range'].range-slider::-ms-fill-lower,
+  input[type='range'].range-slider::-ms-fill-upper {
+    background: transparent;
+    border: none;
+  }
+}

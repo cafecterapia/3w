@@ -1,23 +1,25 @@
 import RegisterForm from './register-form';
 import { registerUser } from './actions';
 
-interface RegisterPageProps {
-  searchParams: {
-    plan?: string;
-    scheduling?: string;
-    price?: string;
-  };
+interface RegisterSearchParams {
+  plan?: string;
+  scheduling?: string;
+  price?: string;
 }
 
-export default function RegisterPage({ searchParams }: RegisterPageProps) {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<RegisterSearchParams>;
+}) {
+  const sp = await searchParams;
+
   const planDetails =
-    searchParams.plan && searchParams.scheduling && searchParams.price
+    sp.plan && sp.scheduling && sp.price
       ? {
-          classCount: parseInt(searchParams.plan),
-          schedulingOption: searchParams.scheduling as
-            | 'recurring'
-            | 'on-demand',
-          totalPrice: parseFloat(searchParams.price),
+          classCount: parseInt(sp.plan),
+          schedulingOption: sp.scheduling as 'recurring' | 'on-demand',
+          totalPrice: parseFloat(sp.price),
         }
       : null;
 

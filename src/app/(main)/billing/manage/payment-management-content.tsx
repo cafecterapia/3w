@@ -11,7 +11,10 @@ interface PaymentManagementContentProps {
 
 type MethodTab = 'pix' | 'cards' | 'boleto';
 
-export function PaymentManagementContent({ userName, userEmail }: PaymentManagementContentProps) {
+export function PaymentManagementContent({
+  userName,
+  userEmail,
+}: PaymentManagementContentProps) {
   const {
     paymentMethods,
     billingInfo,
@@ -35,10 +38,15 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
   );
 
   const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount / 100);
+    new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(amount / 100);
 
   const formatMonth = (date: Date) =>
-    new Intl.DateTimeFormat('pt-BR', { year: 'numeric', month: 'long' }).format(date);
+    new Intl.DateTimeFormat('pt-BR', { year: 'numeric', month: 'long' }).format(
+      date
+    );
 
   const statusPill = (status: string) => {
     switch (status) {
@@ -49,7 +57,11 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
       case 'failed':
         return { text: 'Falhou', color: 'text-gray-600', dot: 'bg-gray-400' };
       case 'cancelled':
-        return { text: 'Cancelado', color: 'text-gray-600', dot: 'bg-gray-400' };
+        return {
+          text: 'Cancelado',
+          color: 'text-gray-600',
+          dot: 'bg-gray-400',
+        };
       default:
         return { text: status, color: 'text-gray-600', dot: 'bg-gray-400' };
     }
@@ -80,12 +92,27 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <div className="rounded-lg border bg-gray-50 p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M12 9v4m0 4h.01M10.29 3.86l-7.5 12.99A2 2 0 004.5 20h15a2 2 0 001.71-3.15l-7.5-12.99a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                className="h-5 w-5 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 9v4m0 4h.01M10.29 3.86l-7.5 12.99A2 2 0 004.5 20h15a2 2 0 001.71-3.15l-7.5-12.99a2 2 0 00-3.42 0z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <p className="text-sm text-gray-900">{error}</p>
             </div>
-            <button onClick={clearError} className="text-sm text-gray-900 hover:opacity-80">Fechar</button>
+            <button
+              onClick={clearError}
+              className="text-sm text-gray-900 hover:opacity-80"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}
@@ -95,31 +122,85 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <svg
+                className="h-5 w-5 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M3 7h18M3 12h18M3 17h18"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
               </svg>
               Métodos de pagamento
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             <div className="flex items-center gap-2">
-              <TabButton label="PIX" active={activeTab === 'pix'} onClick={() => setActiveTab('pix')} icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-                  <path d="M7.05 7.05L12 2.1l4.95 4.95L12 12 7.05 7.05zM12 12l4.95 4.95L12 21.9l-4.95-4.95L12 12z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              } />
-              <TabButton label="Cartões" active={activeTab === 'cards'} onClick={() => setActiveTab('cards')} icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-                  <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.2"/>
-                  <path d="M3 10h18" stroke="currentColor" strokeWidth="1.2"/>
-                </svg>
-              } />
-              <TabButton label="Boleto" active={activeTab === 'boleto'} onClick={() => setActiveTab('boleto')} icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-                  <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="1.2"/>
-                  <path d="M8 7v10M12 7v10M16 7v10" stroke="currentColor" strokeWidth="1.2"/>
-                </svg>
-              } />
+              <TabButton
+                label="PIX"
+                active={activeTab === 'pix'}
+                onClick={() => setActiveTab('pix')}
+                icon={
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+                    <path
+                      d="M7.05 7.05L12 2.1l4.95 4.95L12 12 7.05 7.05zM12 12l4.95 4.95L12 21.9l-4.95-4.95L12 12z"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                }
+              />
+              <TabButton
+                label="Cartões"
+                active={activeTab === 'cards'}
+                onClick={() => setActiveTab('cards')}
+                icon={
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="14"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                    <path
+                      d="M3 10h18"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                  </svg>
+                }
+              />
+              <TabButton
+                label="Boleto"
+                active={activeTab === 'boleto'}
+                onClick={() => setActiveTab('boleto')}
+                icon={
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+                    <rect
+                      x="4"
+                      y="3"
+                      width="16"
+                      height="18"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                    <path
+                      d="M8 7v10M12 7v10M16 7v10"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                  </svg>
+                }
+              />
             </div>
 
             <div className="mt-6">
@@ -143,8 +224,18 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M20 7L9 18l-5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                className="h-5 w-5 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M20 7L9 18l-5-5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Método principal
             </CardTitle>
@@ -156,19 +247,28 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
                   <div className="flex items-center gap-3">
                     <BrandBadge brand={defaultPaymentMethod.brand} />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">•••• •••• •••• {defaultPaymentMethod.last4}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        •••• •••• •••• {defaultPaymentMethod.last4}
+                      </p>
                       <p className="text-xs text-gray-600">
-                        Expira {defaultPaymentMethod.expiryMonth?.toString().padStart(2, '0')}/
-                        {defaultPaymentMethod.expiryYear?.toString().slice(-2)}
+                        Expira{' '}
+                        {defaultPaymentMethod.expiryMonth
+                          ?.toString()
+                          .padStart(2, '0')}
+                        /{defaultPaymentMethod.expiryYear?.toString().slice(-2)}
                       </p>
                     </div>
                   </div>
-                  <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">Ativo</span>
+                  <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">
+                    Ativo
+                  </span>
                 </div>
               </div>
             ) : (
               <div className="rounded-lg border p-4">
-                <p className="text-sm text-gray-600">Nenhum método principal definido.</p>
+                <p className="text-sm text-gray-600">
+                  Nenhum método principal definido.
+                </p>
               </div>
             )}
 
@@ -196,18 +296,37 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zM4 22a8 8 0 0116 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                className="h-5 w-5 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zM4 22a8 8 0 0116 0"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Informações de cobrança
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Field label="Nome no Cartão" value={billingInfo?.name || userName || 'Não informado'} />
-              <Field label="E-mail de Cobrança" value={billingInfo?.email || userEmail || 'Não informado'} />
+              <Field
+                label="Nome no Cartão"
+                value={billingInfo?.name || userName || 'Não informado'}
+              />
+              <Field
+                label="E-mail de Cobrança"
+                value={billingInfo?.email || userEmail || 'Não informado'}
+              />
               <Field label="CPF" value={billingInfo?.cpf || '000.000.000-00'} />
-              <Field label="Telefone" value={billingInfo?.phone || 'Não informado'} />
+              <Field
+                label="Telefone"
+                value={billingInfo?.phone || 'Não informado'}
+              />
             </div>
             <div className="mt-6">
               <button
@@ -223,8 +342,17 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+              <svg
+                className="h-5 w-5 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7l8-4z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
               </svg>
               Segurança e configurações
             </CardTitle>
@@ -234,21 +362,33 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
               title="Notificações de pagamento"
               description="Receba alertas sobre cobranças e renovações"
               enabled={paymentSettings.emailNotifications}
-              onToggle={() => updatePaymentSettings({ emailNotifications: !paymentSettings.emailNotifications })}
+              onToggle={() =>
+                updatePaymentSettings({
+                  emailNotifications: !paymentSettings.emailNotifications,
+                })
+              }
               disabled={isUpdating}
             />
             <ToggleRow
               title="Renovação automática"
               description="Renove automaticamente sua assinatura"
               enabled={paymentSettings.autoRenewal}
-              onToggle={() => updatePaymentSettings({ autoRenewal: !paymentSettings.autoRenewal })}
+              onToggle={() =>
+                updatePaymentSettings({
+                  autoRenewal: !paymentSettings.autoRenewal,
+                })
+              }
               disabled={isUpdating}
             />
             <ToggleRow
               title="Recibos por e-mail"
               description="Receba seus comprovantes por e-mail"
               enabled={paymentSettings.emailReceipts}
-              onToggle={() => updatePaymentSettings({ emailReceipts: !paymentSettings.emailReceipts })}
+              onToggle={() =>
+                updatePaymentSettings({
+                  emailReceipts: !paymentSettings.emailReceipts,
+                })
+              }
               disabled={isUpdating}
             />
           </CardContent>
@@ -261,12 +401,24 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                  <path d="M8 7h13M8 12h13M8 17h13M3 7h.01M3 12h.01M3 17h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <svg
+                  className="h-5 w-5 text-gray-900"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M8 7h13M8 12h13M8 17h13M3 7h.01M3 12h.01M3 17h.01"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
                 </svg>
                 Histórico recente
               </CardTitle>
-              <a href="/billing" className="text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4">
+              <a
+                href="/billing"
+                className="text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4"
+              >
                 Ver tudo
               </a>
             </div>
@@ -275,16 +427,23 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
             {paymentHistory.slice(0, 5).map((p) => {
               const status = statusPill(p.status);
               return (
-                <div key={p.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between rounded-lg border p-3"
+                >
                   <div className="flex items-center gap-3">
                     <span className={`h-2 w-2 rounded-full ${status.dot}`} />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{formatMonth(p.date)}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {formatMonth(p.date)}
+                      </p>
                       <p className="text-xs text-gray-600">{p.description}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{formatCurrency(p.amount)}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {formatCurrency(p.amount)}
+                    </p>
                     <p className={`text-xs ${status.color}`}>{status.text}</p>
                   </div>
                 </div>
@@ -297,21 +456,44 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
           <CardContent className="p-6">
             <div className="flex items-start gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-md border bg-white">
-                <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 18h.01M12 6v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                <svg
+                  className="h-5 w-5 text-gray-900"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 18h.01M12 6v8"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-900">Precisa de ajuda?</h3>
+                <h3 className="text-sm font-medium text-gray-900">
+                  Precisa de ajuda?
+                </h3>
                 <p className="mt-1 text-sm text-gray-600">
                   Suporte para pagamentos, cobranças e questões técnicas.
                 </p>
                 <div className="mt-3 flex gap-2">
-                  <a href="/support" className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-secondary hover:opacity-90">
+                  <a
+                    href="/support"
+                    className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-secondary hover:opacity-90"
+                  >
                     Falar com suporte
                   </a>
-                  <a href="/support#faq-pagamentos" className="inline-flex items-center justify-center rounded-md border bg-background px-3 py-2 text-sm text-gray-900 hover:opacity-80">
+                  <a
+                    href="/support#faq-pagamentos"
+                    className="inline-flex items-center justify-center rounded-md border bg-background px-3 py-2 text-sm text-gray-900 hover:opacity-80"
+                  >
                     FAQ pagamentos
                   </a>
                 </div>
@@ -326,8 +508,15 @@ export function PaymentManagementContent({ userName, userEmail }: PaymentManagem
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/20 p-4">
           <div className="w-full max-w-md rounded-lg border bg-card p-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Adicionar novo cartão</h3>
-              <button onClick={() => setShowAddCard(false)} className="text-sm text-gray-900 hover:opacity-80">Fechar</button>
+              <h3 className="text-base font-semibold text-gray-900">
+                Adicionar novo cartão
+              </h3>
+              <button
+                onClick={() => setShowAddCard(false)}
+                className="text-sm text-gray-900 hover:opacity-80"
+              >
+                Fechar
+              </button>
             </div>
             <div className="mt-4 space-y-3">
               <Input placeholder="Nome no cartão" />
@@ -357,19 +546,33 @@ function PixPanel() {
     <div className="rounded-lg border p-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" className="h-4 w-4 text-gray-900" fill="none">
-            <path d="M7.05 7.05L12 2.1l4.95 4.95L12 12 7.05 7.05zM12 12l4.95 4.95L12 21.9l-4.95-4.95L12 12z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4 text-gray-900"
+            fill="none"
+          >
+            <path
+              d="M7.05 7.05L12 2.1l4.95 4.95L12 12 7.05 7.05zM12 12l4.95 4.95L12 21.9l-4.95-4.95L12 12z"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           <h3 className="text-sm font-medium text-gray-900">PIX</h3>
         </div>
-        <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">Principal</span>
+        <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">
+          Principal
+        </span>
       </div>
       <div className="mt-3 space-y-2">
         <p className="text-sm text-gray-600">
-          Configure e gerencie pagamentos via PIX. Aprovação imediata e confirmação automática.
+          Configure e gerencie pagamentos via PIX. Aprovação imediata e
+          confirmação automática.
         </p>
         <div className="rounded-md border bg-gray-50 p-3 text-xs text-gray-700">
-          Use PIX como forma padrão de pagamento para novas cobranças quando disponível.
+          Use PIX como forma padrão de pagamento para novas cobranças quando
+          disponível.
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -415,11 +618,16 @@ function CardsPanel({
         </div>
       )}
       {methods.map((m) => (
-        <div key={m.id} className={`flex items-center justify-between rounded-lg border p-3 ${!m.isActive ? 'opacity-60' : ''}`}>
+        <div
+          key={m.id}
+          className={`flex items-center justify-between rounded-lg border p-3 ${!m.isActive ? 'opacity-60' : ''}`}
+        >
           <div className="flex items-center gap-3">
             <BrandBadge brand={m.brand} />
             <div>
-              <p className="text-sm font-medium text-gray-900">•••• •••• •••• {m.last4}</p>
+              <p className="text-sm font-medium text-gray-900">
+                •••• •••• •••• {m.last4}
+              </p>
               <p className="text-xs text-gray-600">
                 {m.expiryMonth && m.expiryYear
                   ? `Expira ${m.expiryMonth.toString().padStart(2, '0')}/${m.expiryYear.toString().slice(-2)}`
@@ -428,7 +636,11 @@ function CardsPanel({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {m.isDefault && <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">Principal</span>}
+            {m.isDefault && (
+              <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">
+                Principal
+              </span>
+            )}
             {!m.isDefault && m.isActive && (
               <button
                 onClick={() => setDefault(m.id)}
@@ -454,7 +666,12 @@ function CardsPanel({
         disabled={isUpdating}
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-          <path d="M12 6v12M6 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          <path
+            d="M12 6v12M6 12h12"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
         </svg>
         Adicionar novo cartão
       </button>
@@ -467,8 +684,20 @@ function BoletoPanel() {
     <div className="rounded-lg border p-4">
       <div className="flex items-center gap-2">
         <svg viewBox="0 0 24 24" className="h-4 w-4 text-gray-900" fill="none">
-          <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="1.2"/>
-          <path d="M8 7v10M12 7v10M16 7v10" stroke="currentColor" strokeWidth="1.2"/>
+          <rect
+            x="4"
+            y="3"
+            width="16"
+            height="18"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.2"
+          />
+          <path
+            d="M8 7v10M12 7v10M16 7v10"
+            stroke="currentColor"
+            strokeWidth="1.2"
+          />
         </svg>
         <h3 className="text-sm font-medium text-gray-900">Boleto</h3>
       </div>
@@ -537,7 +766,9 @@ function TabButton({
       onClick={onClick}
       className={[
         'inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors',
-        active ? 'border-gray-900 bg-gray-50 text-gray-900' : 'border-gray-200 text-gray-700 hover:border-gray-900',
+        active
+          ? 'border-gray-900 bg-gray-50 text-gray-900'
+          : 'border-gray-200 text-gray-700 hover:border-gray-900',
       ].join(' ')}
     >
       <span className="text-gray-900">{icon}</span>
@@ -550,7 +781,9 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div className="mb-1 text-xs text-gray-600">{label}</div>
-      <div className="rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-900">{value}</div>
+      <div className="rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-900">
+        {value}
+      </div>
     </div>
   );
 }

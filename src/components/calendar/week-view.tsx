@@ -1,4 +1,10 @@
-import { addDays, startOfWeek, key, filterSlots, fmtTime } from '@/lib/calendar-utils';
+import {
+  addDays,
+  startOfWeek,
+  key,
+  filterSlots,
+  fmtTime,
+} from '@/lib/calendar-utils';
 import type { Slot } from '@/types/calendar';
 
 interface WeekViewProps {
@@ -8,7 +14,12 @@ interface WeekViewProps {
   onSelectDate: (d: Date) => void;
 }
 
-export function WeekView({ cursor, slots, search, onSelectDate }: WeekViewProps) {
+export function WeekView({
+  cursor,
+  slots,
+  search,
+  onSelectDate,
+}: WeekViewProps) {
   const start = startOfWeek(cursor);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const hours = Array.from({ length: 14 }, (_, i) => i + 7);
@@ -26,14 +37,19 @@ export function WeekView({ cursor, slots, search, onSelectDate }: WeekViewProps)
             <div className="font-medium text-gray-900">
               {new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(d)}
             </div>
-            <div>{d.getDate()}/{d.getMonth() + 1}</div>
+            <div>
+              {d.getDate()}/{d.getMonth() + 1}
+            </div>
           </button>
         ))}
       </div>
       <div className="grid grid-cols-8">
         <div className="col-span-1">
           {hours.map((h) => (
-            <div key={h} className="h-14 border-b px-2 py-2 text-xs text-gray-600">
+            <div
+              key={h}
+              className="h-14 border-b px-2 py-2 text-xs text-gray-600"
+            >
               {String(h).padStart(2, '0')}:00
             </div>
           ))}
@@ -47,7 +63,9 @@ export function WeekView({ cursor, slots, search, onSelectDate }: WeekViewProps)
                 const has = filtered.some((s) => s.start.getHours() === h);
                 return (
                   <div key={h} className="h-14 border-l border-b px-2 py-2">
-                    {has && <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-900" />}
+                    {has && (
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-900" />
+                    )}
                   </div>
                 );
               })}

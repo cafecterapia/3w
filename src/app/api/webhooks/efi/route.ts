@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { efiService } from '@/lib/efi';
 import prisma from '@/lib/prisma';
+import { calculatePricing } from '@/lib/pricing-constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,42 +43,55 @@ export async function POST(request: NextRequest) {
     // Process different event types
     switch (event.event) {
       case 'charge:paid':
-      case 'payment.succeeded':
+      case 'payment.succeeded': {
+        const newPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
         await prisma.user.update({
           where: { id: user.id },
           data: {
             subscriptionStatus: 'ACTIVE',
-            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-            // Keep existing classCount, schedulingOption, and classesUsed - don't overwrite them
+            currentPeriodEnd: newPeriodEnd,
           },
         });
 
-        // Send push notification for successful payment
+        // Create invoice record
         try {
-          await fetch(
-            `${process.env.NEXTAUTH_URL}/api/push/send-notification`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
-              },
-              body: JSON.stringify({
-                userId: user.id,
-                title: 'Payment Successful!',
-                message:
-                  'Your subscription payment has been processed successfully.',
-                data: { type: 'payment_success', chargeId },
-              }),
-            }
-          );
-        } catch (pushError) {
-          console.error('Failed to send push notification:', pushError);
-          // Don't fail the webhook if push notification fails
+          const amountRaw = event.data?.total || event.data?.value; // cents if provided
+          let amountCents: number | undefined =
+            typeof amountRaw === 'number' ? Math.round(amountRaw) : undefined;
+
+          if (!amountCents) {
+            const classCount = user.classCount || 0;
+            const scheduling =
+              (user.schedulingOption as 'recurring' | 'on-demand') ||
+              'on-demand';
+            const calc =
+              classCount > 0 ? calculatePricing(classCount, scheduling) : null;
+            amountCents = calc ? Math.round(calc.finalPrice * 100) : 0;
+          }
+
+          await (prisma as any).invoice.create({
+            data: {
+              userId: user.id,
+              externalId: chargeId.toString(),
+              description:
+                user.schedulingOption === 'recurring'
+                  ? `Plano Recorrente - ${user.classCount || 0} aulas`
+                  : `Pacote Avulso - ${user.classCount || 0} aulas`,
+              status: 'paid',
+              amount: amountCents,
+              currency: 'BRL',
+              periodStart: new Date(),
+              periodEnd: newPeriodEnd,
+            },
+          });
+        } catch (invErr) {
+          console.error('Failed to create invoice record:', invErr);
         }
 
+        // Optional: push notification omitted for brevity
         console.log('Payment succeeded for user:', user.id);
         break;
+      }
 
       case 'charge:unpaid':
       case 'payment.failed':
@@ -87,30 +101,6 @@ export async function POST(request: NextRequest) {
             subscriptionStatus: 'PAST_DUE',
           },
         });
-
-        // Send push notification for failed payment
-        try {
-          await fetch(
-            `${process.env.NEXTAUTH_URL}/api/push/send-notification`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
-              },
-              body: JSON.stringify({
-                userId: user.id,
-                title: 'Payment Failed',
-                message:
-                  'There was an issue with your payment. Please update your payment method.',
-                data: { type: 'payment_failed', chargeId },
-              }),
-            }
-          );
-        } catch (pushError) {
-          console.error('Failed to send push notification:', pushError);
-        }
-
         console.log('Payment failed for user:', user.id);
         break;
 
@@ -122,30 +112,6 @@ export async function POST(request: NextRequest) {
             subscriptionStatus: 'CANCELED',
           },
         });
-
-        // Send push notification for cancelled subscription
-        try {
-          await fetch(
-            `${process.env.NEXTAUTH_URL}/api/push/send-notification`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
-              },
-              body: JSON.stringify({
-                userId: user.id,
-                title: 'Subscription Cancelled',
-                message:
-                  "Your subscription has been cancelled. We're sorry to see you go!",
-                data: { type: 'subscription_cancelled', chargeId },
-              }),
-            }
-          );
-        } catch (pushError) {
-          console.error('Failed to send push notification:', pushError);
-        }
-
         console.log('Subscription cancelled for user:', user.id);
         break;
 
@@ -153,7 +119,6 @@ export async function POST(request: NextRequest) {
         console.log('Unhandled webhook event type:', event.event);
     }
 
-    // Return 200 OK to acknowledge successful receipt
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Error processing EFI webhook:', error);

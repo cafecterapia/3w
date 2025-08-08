@@ -2,6 +2,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 
 export default async function ProfilePage() {
@@ -31,9 +32,11 @@ export default async function ProfilePage() {
           {/* Hero avatar */}
           <div className="flex items-center gap-4">
             {user?.image ? (
-              <img
+              <Image
                 src={user.image}
                 alt="Foto do perfil"
+                width={56}
+                height={56}
                 className="h-14 w-14 rounded-full object-cover"
               />
             ) : (
@@ -82,9 +85,11 @@ export default async function ProfilePage() {
                 renderValue={
                   <div className="flex items-center gap-4">
                     {user?.image ? (
-                      <img
+                      <Image
                         src={user.image}
                         alt="Foto do perfil"
+                        width={48}
+                        height={48}
                         className="h-12 w-12 rounded-full object-cover"
                       />
                     ) : (
@@ -180,7 +185,7 @@ export default async function ProfilePage() {
                 <PrimaryButton as={Link} href="/settings">
                   Editar configurações
                 </PrimaryButton>
-                <SecondaryButton as="a" href="/api/auth/signout">
+                <SecondaryButton as={Link} href="/api/auth/signout">
                   Sair da conta
                 </SecondaryButton>
               </div>
@@ -245,18 +250,18 @@ export default async function ProfilePage() {
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <a
+                  <Link
                     href="/settings"
                     className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-secondary hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                   >
                     Abrir configurações
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/support"
                     className="inline-flex items-center justify-center rounded-md border border-border bg-secondary px-3 py-1.5 text-xs font-medium hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                   >
                     Falar com suporte
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,21 +1,27 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { 
-  stripTime, 
-  addDays, 
-  addMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfCalendar, 
+import {
+  stripTime,
+  addDays,
+  addMonths,
+  startOfMonth,
+  endOfMonth,
+  startOfCalendar,
   startOfWeek,
-  isSameDay, 
-  key, 
-  fmtTime, 
+  isSameDay,
+  key,
+  fmtTime,
   filterSlots,
-  durationLabel
+  durationLabel,
 } from '@/lib/calendar-utils';
-import { WeekView, DayView, CompactPicker, Chip, SkeletonMonth } from '@/components/calendar';
+import {
+  WeekView,
+  DayView,
+  CompactPicker,
+  Chip,
+  SkeletonMonth,
+} from '@/components/calendar';
 import type { View, Slot, CreditPack } from '@/types/calendar';
 
 export default function CalendarPage() {
@@ -31,7 +37,14 @@ export default function CalendarPage() {
   const [duration, setDuration] = useState<number>(60);
   const [isLoading, setIsLoading] = useState(false);
 
-  const remaining = useMemo(() => Math.max(credits.total - credits.used - Object.keys(selectedSlots).length, 0), [credits, selectedSlots]);
+  const remaining = useMemo(
+    () =>
+      Math.max(
+        credits.total - credits.used - Object.keys(selectedSlots).length,
+        0
+      ),
+    [credits, selectedSlots]
+  );
 
   // Generate mock slots (replace with API)
   useEffect(() => {
@@ -82,7 +95,10 @@ export default function CalendarPage() {
   const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
   const monthLabel = useMemo(() => {
-    return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(cursor);
+    return new Intl.DateTimeFormat('pt-BR', {
+      month: 'long',
+      year: 'numeric',
+    }).format(cursor);
   }, [cursor]);
 
   const selectedCount = Object.keys(selectedSlots).length;
@@ -100,7 +116,10 @@ export default function CalendarPage() {
   const clearSelection = () => setSelectedSlots({});
   const commitSelection = () => {
     // Mock commit – integrate with API
-    setCredits((c) => ({ ...c, used: c.used + Object.keys(selectedSlots).length }));
+    setCredits((c) => ({
+      ...c,
+      used: c.used + Object.keys(selectedSlots).length,
+    }));
     setSelectedSlots({});
   };
 
@@ -121,13 +140,26 @@ export default function CalendarPage() {
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Agendar aulas</h1>
-          <p className="text-sm text-gray-600">Use seus créditos para reservar horários de aula</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Agendar aulas
+          </h1>
+          <p className="text-sm text-gray-600">
+            Use seus créditos para reservar horários de aula
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="inline-flex items-center gap-2 rounded-md border px-3 py-2">
-            <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-              <path d="M12 6v12M6 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <svg
+              className="h-4 w-4 text-gray-900"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M12 6v12M6 12h12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
             <div className="text-xs">
               <div className="font-medium text-gray-900">Créditos</div>
@@ -135,8 +167,17 @@ export default function CalendarPage() {
             </div>
           </div>
           <div className="inline-flex items-center gap-2 rounded-md border px-3 py-2">
-            <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-              <path d="M3 5h18M3 10h18M3 15h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <svg
+              className="h-4 w-4 text-gray-900"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M3 5h18M3 10h18M3 15h10"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
             <select
               value={view}
@@ -149,18 +190,49 @@ export default function CalendarPage() {
             </select>
           </div>
           <div className="inline-flex overflow-hidden rounded-md border">
-            <button onClick={goPrev} className="px-3 py-2 hover:bg-gray-50" aria-label="Anterior">
-              <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <button
+              onClick={goPrev}
+              className="px-3 py-2 hover:bg-gray-50"
+              aria-label="Anterior"
+            >
+              <svg
+                className="h-4 w-4 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M15 6l-6 6 6 6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
             <div className="px-4 py-2 text-sm text-gray-900">{monthLabel}</div>
-            <button onClick={goNext} className="px-3 py-2 hover:bg-gray-50" aria-label="Próximo">
-              <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <button
+              onClick={goNext}
+              className="px-3 py-2 hover:bg-gray-50"
+              aria-label="Próximo"
+            >
+              <svg
+                className="h-4 w-4 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
-            <button onClick={goToday} className="border-l px-3 py-2 text-sm hover:bg-gray-50">
+            <button
+              onClick={goToday}
+              className="border-l px-3 py-2 text-sm hover:bg-gray-50"
+            >
               Hoje
             </button>
           </div>
@@ -168,15 +240,39 @@ export default function CalendarPage() {
             onClick={() => setFiltersOpen((v) => !v)}
             className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-gray-50"
           >
-            <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-              <path d="M4 6h16M6 12h12M10 18h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <svg
+              className="h-4 w-4 text-gray-900"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M4 6h16M6 12h12M10 18h4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
             Filtros
           </button>
           <div className="relative">
-            <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-900" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M20 20l-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-900"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M20 20l-3-3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
             <input
               value={search}
@@ -247,7 +343,9 @@ export default function CalendarPage() {
             <div className="rounded-lg border">
               <div className="grid grid-cols-7 border-b bg-gray-50 text-center text-xs text-gray-600">
                 {weekDays.map((d) => (
-                  <div key={d} className="px-2 py-2">{d}</div>
+                  <div key={d} className="px-2 py-2">
+                    {d}
+                  </div>
                 ))}
               </div>
               {isLoading ? (
@@ -277,24 +375,32 @@ export default function CalendarPage() {
                           <span
                             className={[
                               'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs',
-                              isToday ? 'bg-gray-900 text-white' : 'text-gray-900',
+                              isToday
+                                ? 'bg-gray-900 text-white'
+                                : 'text-gray-900',
                             ].join(' ')}
                           >
                             {d.getDate()}
                           </span>
                           {filtered.length > 0 && (
-                            <span className="text-[10px] text-gray-500">{filtered.length} horários</span>
+                            <span className="text-[10px] text-gray-500">
+                              {filtered.length} horários
+                            </span>
                           )}
                         </div>
                         <div className="space-y-1">
                           {filtered.slice(0, 3).map((s) => (
                             <div key={s.id} className="flex items-center gap-2">
                               <span className="h-1.5 w-1.5 rounded-full bg-gray-900" />
-                              <span className="text-xs text-gray-900">{fmtTime(s.start)}</span>
+                              <span className="text-xs text-gray-900">
+                                {fmtTime(s.start)}
+                              </span>
                             </div>
                           ))}
                           {filtered.length > 3 && (
-                            <div className="text-[10px] text-gray-500">+{filtered.length - 3}</div>
+                            <div className="text-[10px] text-gray-500">
+                              +{filtered.length - 3}
+                            </div>
                           )}
                         </div>
                       </button>
@@ -349,28 +455,56 @@ export default function CalendarPage() {
           <div className="rounded-lg border p-4">
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 7L9 18l-5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <svg
+                  className="h-4 w-4 text-gray-900"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M20 7L9 18l-5-5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
-                <h3 className="text-sm font-medium text-gray-900">Sua seleção</h3>
+                <h3 className="text-sm font-medium text-gray-900">
+                  Sua seleção
+                </h3>
               </div>
-              <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">{selectedCount} aula(s)</span>
+              <span className="rounded-full border px-2.5 py-1 text-xs text-gray-900">
+                {selectedCount} aula(s)
+              </span>
             </div>
             {selectedCount === 0 ? (
-              <p className="text-sm text-gray-600">Escolha horários no calendário.</p>
+              <p className="text-sm text-gray-600">
+                Escolha horários no calendário.
+              </p>
             ) : (
               <div className="space-y-2">
                 {Object.values(selectedSlots)
                   .sort((a, b) => a.start.getTime() - b.start.getTime())
                   .map((s) => (
-                    <div key={s.id} className="flex items-center justify-between rounded-md border p-2">
+                    <div
+                      key={s.id}
+                      className="flex items-center justify-between rounded-md border p-2"
+                    >
                       <div className="text-xs">
                         <div className="font-medium text-gray-900">
-                          {new Intl.DateTimeFormat('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).format(s.start)}
+                          {new Intl.DateTimeFormat('pt-BR', {
+                            weekday: 'short',
+                            day: '2-digit',
+                            month: 'short',
+                          }).format(s.start)}
                         </div>
-                        <div className="text-gray-600">{fmtTime(s.start)} — {fmtTime(s.end)}</div>
+                        <div className="text-gray-600">
+                          {fmtTime(s.start)} — {fmtTime(s.end)}
+                        </div>
                       </div>
-                      <button onClick={() => handleSelectSlot(s)} className="text-xs text-gray-900 hover:opacity-80">
+                      <button
+                        onClick={() => handleSelectSlot(s)}
+                        className="text-xs text-gray-900 hover:opacity-80"
+                      >
                         Remover
                       </button>
                     </div>
@@ -378,9 +512,14 @@ export default function CalendarPage() {
               </div>
             )}
             <div className="mt-3 flex items-center justify-between">
-              <div className="text-xs text-gray-600">{remaining} créditos restantes</div>
+              <div className="text-xs text-gray-600">
+                {remaining} créditos restantes
+              </div>
               <div className="flex gap-2">
-                <button onClick={clearSelection} className="rounded-md border px-3 py-2 text-xs hover:bg-gray-50">
+                <button
+                  onClick={clearSelection}
+                  className="rounded-md border px-3 py-2 text-xs hover:bg-gray-50"
+                >
                   Limpar
                 </button>
                 <button
@@ -397,9 +536,24 @@ export default function CalendarPage() {
           {/* Legend and tips */}
           <div className="rounded-lg border p-4">
             <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900">
-              <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
-                <path d="M12 18h.01M12 6v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+              <svg
+                className="h-4 w-4 text-gray-900"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 18h.01M12 6v8"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
               </svg>
               Dicas
             </h3>

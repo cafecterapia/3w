@@ -103,7 +103,9 @@ export async function POST(request: NextRequest) {
       efiResponse = await efi.pixCreateImmediateCharge({}, chargePayload);
     } catch (efiError) {
       console.error('EFI payment creation error:', efiError);
-      const errorMessage = (efiError as any)?.response?.data?.mensagem || 'Payment system temporarily unavailable';
+      const errorMessage =
+        (efiError as any)?.response?.data?.mensagem ||
+        'Payment system temporarily unavailable';
       return NextResponse.json(
         { success: false, message: errorMessage },
         { status: 503 }

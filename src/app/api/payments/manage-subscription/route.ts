@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'create_portal_session':
-        // For now, redirect to the billing manage page
         return NextResponse.json({
           success: true,
           portalUrl: '/billing/manage',
@@ -46,11 +45,21 @@ export async function POST(request: NextRequest) {
           message: 'Payment method update initiated',
         });
 
+      case 'pause_subscription':
+        // TODO: Integrate with EFI to pause if supported
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { subscriptionStatus: 'PAUSED' },
+        });
+        return NextResponse.json({
+          success: true,
+          message: 'Subscription paused successfully',
+        });
+
       case 'cancel_subscription':
         // TODO: Implement subscription cancellation via EFI
         console.log('Cancelling subscription for user:', user.id);
 
-        // Update user status in database
         await prisma.user.update({
           where: { id: user.id },
           data: {
@@ -64,7 +73,6 @@ export async function POST(request: NextRequest) {
         });
 
       default:
-        // Default action - create portal session
         return NextResponse.json({
           success: true,
           portalUrl: '/billing/manage',

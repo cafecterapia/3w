@@ -74,32 +74,37 @@ export async function getDashboardData(userId: string) {
     : null;
 
   // Helper function to create subscription object from real user data
-  async function createSubscriptionFromUserData(userData: any): Promise<DashboardSubscription> {
+  async function createSubscriptionFromUserData(
+    userData: any
+  ): Promise<DashboardSubscription> {
     const normalizedStatus = normalizeStatus(userData.subscriptionStatus);
-    
+
     // Use the real data stored in the database
     const classCount = userData.classCount || 0;
     const classesUsed = userData.classesUsed || 0;
     const schedulingOption = userData.schedulingOption || 'on-demand';
-    
+
     // Determine subscription type based on actual purchase data
-    const subscriptionType: 'mensal' | 'avulsa' = schedulingOption === 'recurring' ? 'mensal' : 'avulsa';
-    
+    const subscriptionType: 'mensal' | 'avulsa' =
+      schedulingOption === 'recurring' ? 'mensal' : 'avulsa';
+
     // Calculate remaining credits using real data
     const creditsRemaining = Math.max(0, classCount - classesUsed);
-    
+
     // Calculate next amount based on actual subscription type and class count
-    const nextAmount = subscriptionType === 'mensal' && classCount > 0 
-      ? calculatePricing(classCount, 'recurring').finalPrice 
-      : null;
-    
+    const nextAmount =
+      subscriptionType === 'mensal' && classCount > 0
+        ? calculatePricing(classCount, 'recurring').finalPrice
+        : null;
+
     return {
       id: userData.efiSubscriptionId,
       type: subscriptionType,
       status: normalizedStatus,
       creditsRemaining,
       totalCredits: classCount,
-      nextBillingDate: subscriptionType === 'mensal' ? userData.currentPeriodEnd : null,
+      nextBillingDate:
+        subscriptionType === 'mensal' ? userData.currentPeriodEnd : null,
       nextAmount,
     };
   }
@@ -107,10 +112,10 @@ export async function getDashboardData(userId: string) {
   // Helper function to normalize status
   function normalizeStatus(status: string | null): string {
     if (!status) return 'inactive';
-    
+
     // Convert various possible status values to consistent format
     const normalizedStatus = status.toUpperCase();
-    
+
     // Map EFI payment statuses to our internal statuses
     switch (normalizedStatus) {
       case 'PAID':
@@ -148,17 +153,20 @@ export async function getDashboardData(userId: string) {
   if (user?.efiSubscriptionId && subscription && user.classCount) {
     const today = new Date();
     const schedulingOption = user.schedulingOption || 'on-demand';
-    const actualAmount = calculatePricing(user.classCount, schedulingOption as 'recurring' | 'on-demand').finalPrice;
-    
-    invoices.push(
-      {
-        id: '1',
-        invoiceId: 'INV-2025-001',
-        date: user.paymentCreatedAt || new Date(today.getFullYear(), today.getMonth() - 1, 15),
-        amount: actualAmount,
-        status: 'paid',
-      }
-    );
+    const actualAmount = calculatePricing(
+      user.classCount,
+      schedulingOption as 'recurring' | 'on-demand'
+    ).finalPrice;
+
+    invoices.push({
+      id: '1',
+      invoiceId: 'INV-2025-001',
+      date:
+        user.paymentCreatedAt ||
+        new Date(today.getFullYear(), today.getMonth() - 1, 15),
+      amount: actualAmount,
+      status: 'paid',
+    });
   }
 
   return {

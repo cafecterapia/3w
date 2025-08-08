@@ -29,6 +29,7 @@ model User {
   classesUsed        Int?      @default(0) // Track how many classes have been used
   accounts           Account[]
   sessions           Session[]
+  invoices           Invoice[]  // Added relation to invoices
 }
 
 model Account {
@@ -68,4 +69,22 @@ model VerificationToken {
 enum UserRole {
   USER
   ADMIN
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  userId      String
+  externalId  String?  // txid or charge id from EFI
+  description String?
+  status      String   // paid | pending | failed | cancelled
+  amount      Int      // amount in cents
+  currency    String   @default("BRL")
+  periodStart DateTime?
+  periodEnd   DateTime?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([externalId])
 }

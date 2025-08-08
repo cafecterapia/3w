@@ -180,7 +180,6 @@ export function SubscriptionStatusWidget({
               showHeader={false}
               className="max-w-md mx-auto"
               redirectToPayment={true}
-              initialClassCount={2}
             />
           </div>
         </div>
@@ -219,16 +218,25 @@ export function SubscriptionStatusWidget({
             maxWidth: 520,
           }}
         >
-          {subscription.type === 'mensal' ? 'Assinatura mensal' : 'Créditos avulsos'} • {subscription.creditsRemaining || 0} aulas restantes
+          {subscription.type === 'mensal'
+            ? 'Assinatura mensal'
+            : 'Créditos avulsos'}{' '}
+          • {subscription.creditsRemaining || 0} aulas restantes
         </p>
 
         <div
-          style={{ display: 'flex', justifyContent: 'center', marginTop: 16, gap: 12 }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 16,
+            gap: 12,
+          }}
         >
           <ActionLink href="/calendar" label="Agendar Aulas" />
-          {subscription.creditsRemaining && subscription.creditsRemaining <= 2 && (
-            <ActionLink href="/billing" label="Comprar Mais Aulas" />
-          )}
+          {subscription.creditsRemaining &&
+            subscription.creditsRemaining <= 2 && (
+              <ActionLink href="/billing" label="Comprar Mais Aulas" />
+            )}
         </div>
       </div>
     </Card>

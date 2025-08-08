@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type NavItem = {
   href: string;
@@ -16,20 +16,23 @@ export default function AdminNavigation() {
   const navRef = useRef<HTMLElement | null>(null);
   const [focusIndex, setFocusIndex] = useState<number>(0);
 
-  const navItems: NavItem[] = [
-    { href: '/admin/dashboard', label: 'Dashboard' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/subscribers', label: 'Subscribers' },
-    { href: '/admin/payments', label: 'Payments' },
-    { href: '/admin/test-efi', label: 'Test EFI' },
-    { href: '/admin/analytics', label: 'Analytics' },
-  ];
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { href: '/admin/dashboard', label: 'Dashboard' },
+      { href: '/admin/users', label: 'Users' },
+      { href: '/admin/subscribers', label: 'Subscribers' },
+      { href: '/admin/payments', label: 'Payments' },
+      { href: '/admin/test-efi', label: 'Test EFI' },
+      { href: '/admin/analytics', label: 'Analytics' },
+    ],
+    []
+  );
 
   // Keep focusIndex synced with active route for ergonomic keyboard navigation
   useEffect(() => {
     const idx = navItems.findIndex((n) => n.href === pathname);
     if (idx !== -1) setFocusIndex(idx);
-  }, [pathname]);
+  }, [pathname, navItems]);
 
   // Keyboard navigation: left/right arrows to move between tabs
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

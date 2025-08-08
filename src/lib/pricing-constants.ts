@@ -2,8 +2,8 @@
 
 export const BASE_PRICE_PER_CLASS = 50.0;
 export const DISCOUNT_THRESHOLD = 4;
-export const DISCOUNT_PERCENTAGE = 5;
-export const SCHEDULING_DISCOUNT_PERCENTAGE = 5; // Additional discount for recurring scheduling
+export const DISCOUNT_PERCENTAGE = 10; // 10% discount for 4 or more classes
+export const SCHEDULING_DISCOUNT_PERCENTAGE = 0; // Additional discount for recurring scheduling
 export const MAX_CLASSES = 8;
 
 export interface PricingCalculation {
