@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { efi } from '@/lib/efi';
+// import { efi } from '@/lib/efi'; // Temporarily disabled for testing
 
 export async function GET(request: NextRequest) {
   try {
+    // Temporarily disabled for testing
+    return NextResponse.json({
+      success: false,
+      message: 'Payment status endpoint temporarily disabled for testing',
+    });
+
+    /* Temporarily commented out for testing
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -168,6 +175,7 @@ export async function GET(request: NextRequest) {
       paymentData,
       subscriptionStatus: user.subscriptionStatus,
     });
+    */ // End of temporarily commented out code
   } catch (error) {
     console.error('Error checking payment status:', error);
     return NextResponse.json(

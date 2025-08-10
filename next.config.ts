@@ -1,25 +1,13 @@
-import type { NextConfig } from 'next';
+// next.config.ts
 
+import type { NextConfig } from 'next';
+// Import the bundle analyzer
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+// Your original Next.js configuration
 const nextConfig: NextConfig = {
   // Server external packages (moved from experimental)
-  serverExternalPackages: ['@prisma/client', 'prisma', 'sdk-node-apis-efi'],
-
-  // Force dynamic rendering to avoid static generation issues
-  trailingSlash: false,
-  skipTrailingSlashRedirect: true,
-  
-  // Webpack configuration to handle server-only packages
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        crypto: false,
-      };
-    }
-    return config;
-  },
+  serverExternalPackages: ['@prisma/client', 'prisma'],
 
   // PWA Configuration
   generateBuildId: async () => {
@@ -78,4 +66,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Create the analyzer wrapper with its configuration
+const analyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+// Export the wrapped configuration
+export default analyzer(nextConfig);

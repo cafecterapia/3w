@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { efiService } from '@/lib/efi';
+// import { efiService } from '@/lib/efi'; // Temporarily disabled for testing
 
 export async function GET(request: NextRequest) {
   try {

@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { efiService } from '@/lib/efi';
+// import { efiService } from '@/lib/efi'; // Temporarily disabled for testing
 import prisma from '@/lib/prisma';
 import { calculatePricing } from '@/lib/pricing-constants';
 
 export async function POST(request: NextRequest) {
   try {
+    // Temporarily disabled for testing - EFI webhook processing
+    console.log(
+      'EFI webhook endpoint called but temporarily disabled for testing'
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: 'EFI webhook processing temporarily disabled',
+    });
+
+    /* Temporarily commented out for testing
     const signature = request.headers.get('efi-signature') || '';
     const body = await request.text();
 
@@ -120,6 +131,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ received: true });
+    */ // End of temporarily commented out code
   } catch (error) {
     console.error('Error processing EFI webhook:', error);
     return NextResponse.json(

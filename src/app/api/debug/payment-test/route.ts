@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { efi } from '@/lib/efi';
+// import { efi } from '@/lib/efi'; // Temporarily disabled for testing
 import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
+    // Temporarily disabled for testing
+    return NextResponse.json({
+      success: true,
+      message: 'Payment test endpoint temporarily disabled for testing',
+    });
+
+    /* Temporarily commented out for testing
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -79,6 +86,8 @@ export async function POST(request: NextRequest) {
       qrCodeData,
       chargePayload,
     });
+  } catch (error) {
+    */ // End of temporarily commented out code
   } catch (error) {
     console.error('Debug payment test error:', error);
     return NextResponse.json(

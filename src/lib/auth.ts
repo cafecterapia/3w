@@ -6,8 +6,15 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import prisma from './prisma';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Universal NextAuth v5 configuration with unified auth() helper
+const authConfig = {
   adapter: PrismaAdapter(prisma),
+  trustHost: true,
+  session: { strategy: 'jwt' as const },
+  pages: {
+    signIn: '/login',
+    signOut: '/signout',
+  },
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -16,35 +23,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
+        // Updated typings in NextAuth v5 mark credential values as unknown / possibly {}.
+        const email =
+          typeof credentials?.email === 'string'
+            ? credentials.email
+            : undefined;
+        const password =
+          typeof credentials?.password === 'string'
+            ? credentials.password
+            : undefined;
+        if (!email || !password) return null;
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email as string,
-          },
+          where: { email },
         });
-
-        if (!user || !user.password) {
-          return null;
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
+        if (!user || !user.password) return null;
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return null;
         return {
           id: user.id,
-          email: user.email,
+          email: user.email!,
           name: user.name,
           role: (user as any).role || 'USER',
-        };
+        } as any;
       },
     }),
     GoogleProvider({
@@ -56,30 +56,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.AUTH_GITHUB_SECRET || '',
     }),
   ],
-  pages: {
-    signIn: '/login',
-    signOut: '/signout',
-  },
-  session: {
-    strategy: 'jwt',
-  },
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token }) {
-      if (session?.user && token?.sub) {
-        session.user.id = token.sub;
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.sub = (user as any).id;
+        token.role = (user as any).role || 'USER';
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
+      if (session.user && token?.sub) {
+        (session.user as any).id = token.sub;
         (session.user as any).role = token.role || 'USER';
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id;
-        (token as any).role = (user as any).role || 'USER';
-      }
-      return token;
-    },
   },
-});
+};
 
+export const authOptions = authConfig; // backward compatibility if referenced elsewhere
+
+export const { auth, handlers, signIn, signOut } = NextAuth(authConfig);
 export const { GET, POST } = handlers;

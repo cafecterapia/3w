@@ -4,9 +4,6 @@ import { cn } from '@/lib/utils';
 import Providers from '@/components/providers';
 import './globals.css';
 
-// Force dynamic rendering to avoid static generation issues
-export const dynamic = 'force-dynamic';
-
 /**
  * Font Optimization:
  *

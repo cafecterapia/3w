@@ -1,0 +1,75 @@
+
+> 3w@1.0.0 build
+> next build
+
+   ▲ Next.js 15.4.6
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 1000ms
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/46) ...
+   Generating static pages (11/46) 
+   Generating static pages (22/46) 
+   Generating static pages (34/46) 
+ ✓ Generating static pages (46/46)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                     Size  First Load JS
+┌ ○ /                                          180 B         103 kB
+├ ○ /_not-found                                196 B        99.7 kB
+├ ƒ /admin                                     196 B        99.7 kB
+├ ƒ /admin/analytics                         5.03 kB         105 kB
+├ ƒ /admin/dashboard                         4.82 kB         104 kB
+├ ƒ /admin/payments                          1.89 kB         101 kB
+├ ƒ /admin/subscribers                       4.74 kB         104 kB
+├ ƒ /admin/test-efi                          2.05 kB         102 kB
+├ ƒ /admin/users                             5.71 kB         105 kB
+├ ƒ /api/admin                                 196 B        99.7 kB
+├ ƒ /api/admin/test-efi-connection             196 B        99.7 kB
+├ ƒ /api/admin/test-subscription               196 B        99.7 kB
+├ ƒ /api/auth/[...nextauth]                    196 B        99.7 kB
+├ ƒ /api/auth/change-password                  196 B        99.7 kB
+├ ƒ /api/debug/db                              196 B        99.7 kB
+├ ƒ /api/debug/payment-test                    196 B        99.7 kB
+├ ƒ /api/payments/billing-settings             196 B        99.7 kB
+├ ƒ /api/payments/cancel                       196 B        99.7 kB
+├ ƒ /api/payments/create-class-subscription    196 B        99.7 kB
+├ ƒ /api/payments/create-from-profile          196 B        99.7 kB
+├ ƒ /api/payments/create-subscription          196 B        99.7 kB
+├ ƒ /api/payments/manage-subscription          196 B        99.7 kB
+├ ƒ /api/payments/payment-methods              196 B        99.7 kB
+├ ƒ /api/payments/status                       196 B        99.7 kB
+├ ƒ /api/profile/check                         196 B        99.7 kB
+├ ƒ /api/profile/delete                        196 B        99.7 kB
+├ ƒ /api/profile/save                          196 B        99.7 kB
+├ ƒ /api/profile/update                        196 B        99.7 kB
+├ ƒ /api/push/send-notification                196 B        99.7 kB
+├ ƒ /api/push/subscribe                        196 B        99.7 kB
+├ ƒ /api/push/unsubscribe                      196 B        99.7 kB
+├ ƒ /api/webhooks/efi                          196 B        99.7 kB
+├ ƒ /billing                                   180 B         103 kB
+├ ƒ /billing/invoices                          180 B         103 kB
+├ ƒ /billing/invoices/[id]                     180 B         103 kB
+├ ƒ /billing/manage                          5.59 kB         105 kB
+├ ƒ /billing/pay                             6.29 kB         114 kB
+├ ƒ /billing/plan                            2.68 kB         106 kB
+├ ƒ /calendar                                4.04 kB         104 kB
+├ ƒ /dashboard                               6.27 kB         109 kB
+├ ○ /login                                   1.92 kB         108 kB
+├ ƒ /profile                                   174 B         108 kB
+├ ƒ /register                                1.63 kB         104 kB
+├ ƒ /settings                                11.9 kB         115 kB
+├ ○ /signout                                 1.04 kB         107 kB
+└ ƒ /support                                   180 B         103 kB
++ First Load JS shared by all                99.5 kB
+  ├ chunks/4bd1b696-b8480a5056ad6aef.js      54.1 kB
+  ├ chunks/5964-40762e5e54f76035.js          43.5 kB
+  └ other shared chunks (total)              1.87 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
