@@ -1,5 +1,6 @@
 // Efi SDK initialization and helper functions
 import EfiPay from 'sdk-node-apis-efi';
+import { getBaseUrl } from './utils';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -65,7 +66,7 @@ export class EfiService {
             },
           },
         },
-        notification_url: `${process.env.NEXTAUTH_URL}/api/webhooks/efi`,
+        notification_url: `${getBaseUrl()}/api/webhooks/efi`,
       };
 
       const response = await this.client.createOneStepCharge([], body);

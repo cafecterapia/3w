@@ -155,3 +155,22 @@ export function sleep(ms: number): Promise<void> {
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
+
+/**
+ * Resolve the canonical base URL for the app.
+ * Priority:
+ * 1. NEXTAUTH_URL (explicit config)
+ * 2. VERCEL_PROJECT_PRODUCTION_URL / VERCEL_URL (Vercel env)
+ * 3. http://localhost:3000 (fallback)
+ */
+export function getBaseUrl(): string {
+  const explicit = process.env.NEXTAUTH_URL;
+  if (explicit) return explicit.replace(/\/$/, '');
+  const vercel =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+  if (vercel) {
+    const url = vercel.startsWith('http') ? vercel : `https://${vercel}`;
+    return url.replace(/\/$/, '');
+  }
+  return 'http://localhost:3000';
+}

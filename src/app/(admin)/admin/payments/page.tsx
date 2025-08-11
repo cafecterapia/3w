@@ -57,7 +57,8 @@ export default async function PaymentSettingsPage() {
             <li>
               Set up webhook URL:{' '}
               <code className="bg-blue-100 px-1 rounded">
-                {process.env.NEXTAUTH_URL}/api/webhooks/efi
+                {/* Use dynamic base URL resolution to avoid hard-coding */}
+                {`${process.env.NEXTAUTH_URL || (typeof window === 'undefined' ? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000') : window.location.origin)}/api/webhooks/efi`}
               </code>
             </li>
           </ul>

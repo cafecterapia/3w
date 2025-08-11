@@ -7,6 +7,7 @@
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
     "build": "prisma generate && next build",
+    "env:check": "node scripts/check-env.mjs",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
