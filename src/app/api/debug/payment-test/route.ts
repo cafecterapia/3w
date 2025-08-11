@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-// import { efi } from '@/lib/efi'; // Temporarily disabled for testing
+import { efi } from '@/lib/efi';
 import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    // Temporarily disabled for testing
-    return NextResponse.json({
-      success: true,
-      message: 'Payment test endpoint temporarily disabled for testing',
-    });
-
-    /* Temporarily commented out for testing
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -32,41 +25,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if EFI is configured
     if (!process.env.EFI_PIX_KEY) {
       return NextResponse.json(
-        {
-          error: 'EFI PIX key not configured',
-        },
+        { error: 'EFI PIX key not configured' },
         { status: 503 }
       );
     }
 
-    // Create a test PIX charge
     const chargePayload = {
-      calendario: {
-        expiracao: 3600, // 1 hour
-      },
+      calendario: { expiracao: 3600 },
       devedor: {
         cpf: user.cpf.replace(/\D/g, ''),
         nome: user.name,
       },
-      valor: {
-        original: '1.00', // R$ 1.00 for testing
-      },
+      valor: { original: '1.00' },
       chave: process.env.EFI_PIX_KEY,
       solicitacaoPagador: 'Teste de pagamento - DEBUG',
     };
 
     console.log('Creating test charge with payload:', chargePayload);
-
     const efiResponse = await efi.pixCreateImmediateCharge({}, chargePayload);
-
     console.log('EFI Response:', efiResponse);
 
-    // Try to generate QR code
-    let qrCodeData = null;
-    if (efiResponse.loc && efiResponse.loc.id) {
+    let qrCodeData = null as { qrcodeImage: string; qrcodeText: string } | null;
+    if (efiResponse.loc?.id) {
       try {
         const qrCodeResponse = await efi.pixGenerateQRCode({
           id: efiResponse.loc.id,
@@ -87,14 +69,11 @@ export async function POST(request: NextRequest) {
       chargePayload,
     });
   } catch (error) {
-    */ // End of temporarily commented out code
-  } catch (error) {
     console.error('Debug payment test error:', error);
     return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        details: error,
       },
       { status: 500 }
     );

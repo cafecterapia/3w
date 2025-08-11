@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-// import { efi } from '@/lib/efi'; // Temporarily disabled for testing
+import { efi } from '@/lib/efi';
 import { PlanSelection } from '@/types';
 import { calculatePricing } from '@/lib/pricing-constants';
 
 export async function POST(request: NextRequest) {
   try {
-    // Temporarily disabled for testing
-    return NextResponse.json({
-      success: false,
-      message: 'Payment endpoint temporarily disabled for testing',
-    });
-
-    /* Temporarily commented out for testing
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -228,7 +221,6 @@ export async function POST(request: NextRequest) {
       },
       paymentConfirmationUrl: `/billing/pay?txid=${efiResponse.txid}`,
     });
-    */ // End of temporarily commented out code
   } catch (error) {
     console.error('Error creating EfiPay charge:', error);
     const errorMessage =

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "build": "node scripts/run-next-build.cjs",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "2.10.0",
     "@prisma/client": "6.13.0",
+    "@prisma/extension-accelerate": "2.0.2",
     "@tailwindcss/postcss": "4.1.11",
     "bcryptjs": "3.0.2",
     "date-fns": "4.1.0",

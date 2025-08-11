@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-// import { efi } from '@/lib/efi'; // Temporarily disabled for testing
+import { efi } from '@/lib/efi';
 import { calculatePricing } from '@/lib/pricing-constants';
 
 export async function POST(request: NextRequest) {
   try {
-    // Temporarily disabled for testing
-    return NextResponse.json({
-      success: false,
-      message: 'Payment endpoint temporarily disabled for testing',
-    });
-
-    /* Temporarily commented out for testing
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -157,7 +150,6 @@ export async function POST(request: NextRequest) {
       },
       newTxid: efiResponse.txid,
     });
-    */ // End of temporarily commented out code
   } catch (error) {
     console.error('Error creating payment from profile:', error);
     return NextResponse.json(

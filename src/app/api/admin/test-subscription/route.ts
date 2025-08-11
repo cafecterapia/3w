@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-// import { efiService } from '@/lib/efi'; // Temporarily disabled for testing
+import { efiService } from '@/lib/efi';
 import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -31,25 +31,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Temporarily disabled EFI subscription creation for testing
-    // const subscription = await efiService.createSubscription({
-    //   customerId: adminUser.id,
-    //   planId: 'test-plan',
-    //   amount: amount,
-    //   description: 'Test Subscription - Admin Panel',
-    //   customerName: adminUser.name || 'Admin User',
-    //   customerEmail: adminUser.email || 'admin@example.com',
-    //   customerCpf: adminUser.cpf || '11144477735', // Test CPF for sandbox
-    // });
-
-    // Mock subscription for testing
-    const subscription = {
-      id: 'test-subscription-' + Date.now(),
-      status: 'pending',
-      payment_url: 'https://example.com/payment',
-      customer_id: adminUser.id,
-      plan_id: 'test-plan',
-    };
+    const subscription = await efiService.createSubscription({
+      customerId: adminUser.id,
+      planId: 'test-plan',
+      amount: amount, // already cents? ensure caller sends cents
+      description: 'Test Subscription - Admin Panel',
+      customerName: adminUser.name || 'Admin User',
+      customerEmail: adminUser.email || 'admin@example.com',
+      customerCpf: (adminUser.cpf || '11144477735').replace(/\D/g, ''),
+    });
 
     // Save subscription to database
     await prisma.user.update({

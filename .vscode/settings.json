@@ -1,5 +1,5 @@
 {
-    "eslint.nodeEnv": "",
-    "eslint.nodePath": "",
-    "debug.javascript.autoAttachFilter": "smart"
+  "eslint.nodeEnv": "",
+  "eslint.nodePath": "",
+  "debug.javascript.autoAttachFilter": "disabled"
 }

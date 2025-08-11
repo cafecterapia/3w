@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-// import { efiService } from '@/lib/efi'; // Temporarily disabled for testing
+import { efiService } from '@/lib/efi';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,14 +10,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Temporarily disabled EFI connection test for build testing
-    // const testResponse = await efiService.testConnection();
-
-    return NextResponse.json({
-      success: true,
-      message: 'EFI connection test temporarily disabled',
-      data: { status: 'disabled', environment: 'test' },
-    });
+    const testResponse = await efiService.testConnection();
+    return NextResponse.json({ success: true, data: testResponse });
   } catch (error) {
     console.error('EFI connection test failed:', error);
     return NextResponse.json(
