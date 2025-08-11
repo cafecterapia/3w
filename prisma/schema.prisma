@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
@@ -14,10 +14,10 @@ model User {
   email              String?   @unique
   emailVerified      DateTime?
   image              String?
-  password           String?
   efiSubscriptionId  String?   @unique
   subscriptionStatus String?
   currentPeriodEnd   DateTime?
+  password           String?
   pushSubscription   String?
   role               UserRole  @default(USER)
   cpf                String?   @unique
@@ -25,12 +25,12 @@ model User {
   efiLocationId      Int?
   qrCodeImage        String?
   qrCodeText         String?
-  classCount         Int?      // Number of classes purchased
-  schedulingOption   String?   // 'recurring' or 'on-demand'
-  classesUsed        Int?      @default(0) // Track how many classes have been used
+  classCount         Int?
+  classesUsed        Int?      @default(0)
+  schedulingOption   String?
   accounts           Account[]
+  invoices           Invoice[]
   sessions           Session[]
-  invoices           Invoice[]  // Added relation to invoices
 }
 
 model Account {
@@ -67,25 +67,24 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
-
 model Invoice {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  externalId  String?  // txid or charge id from EFI
+  externalId  String?
   description String?
-  status      String   // paid | pending | failed | cancelled
-  amount      Int      // amount in cents
-  currency    String   @default("BRL")
+  status      String
+  amount      Int
+  currency    String    @default("BRL")
   periodStart DateTime?
   periodEnd   DateTime?
-  createdAt   DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([externalId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
