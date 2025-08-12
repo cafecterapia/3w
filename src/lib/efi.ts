@@ -5,10 +5,38 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 
+// In serverless (Vercel) deployments, relying on a static certificate file path may fail
+// if the certificate isn't bundled. We support providing the certificate as a base64
+// environment variable (EFI_CERTIFICATE_BASE64). On first access we decode and persist it
+// to a temporary location and reuse that path for the lifetime of the process.
+
+let materializedCertPath: string | undefined; // Cache across imports
+
+function materializeBase64Certificate(): string | undefined {
+  if (materializedCertPath) return materializedCertPath;
+  const b64 = process.env.EFI_CERTIFICATE_BASE64;
+  if (!b64) return undefined;
+  try {
+    const buffer = Buffer.from(b64.replace(/\s+/g, ''), 'base64');
+    // Basic sanity check (PKCS12 files usually start with 0x30 0x82)
+    if (buffer.length < 16) throw new Error('Decoded certificate too small');
+    const tmpDir = process.env.TMPDIR || '/tmp';
+    const filePath = path.join(tmpDir, 'efi-cert.p12');
+    fs.writeFileSync(filePath, buffer, { mode: 0o600 });
+    materializedCertPath = filePath;
+    return materializedCertPath;
+  } catch (err) {
+    console.error('Failed to decode EFI base64 certificate:', err);
+    return undefined;
+  }
+}
+
 function resolveCertificatePath(): string | undefined {
+  // Priority: base64 > explicit path
+  const fromBase64 = materializeBase64Certificate();
+  if (fromBase64) return fromBase64;
   if (!process.env.EFI_CERTIFICATE_PATH) return undefined;
-  const resolved = path.resolve(process.env.EFI_CERTIFICATE_PATH);
-  return resolved;
+  return path.resolve(process.env.EFI_CERTIFICATE_PATH);
 }
 
 export function getEfiConfigStatus() {
@@ -21,7 +49,8 @@ export function getEfiConfigStatus() {
     webhookSecret: !!process.env.EFI_WEBHOOK_SECRET,
     certificatePath: certPath,
     certificateExists: certExists,
-    hasPassphrase: (process.env.EFI_CERTIFICATE_PASSWORD || '') !== '',
+    hasPassphrase: !!process.env.EFI_CERTIFICATE_PASSWORD,
+    usingBase64: !!process.env.EFI_CERTIFICATE_BASE64,
     environment: process.env.EFI_ENVIRONMENT || 'unset',
     sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
   };
@@ -39,13 +68,37 @@ export function validateEfiConfig(): { ok: boolean; issues: string[] } {
   return { ok: issues.length === 0, issues };
 }
 
-const options = {
+const resolvedCertificatePath = resolveCertificatePath();
+const passphrase = process.env.EFI_CERTIFICATE_PASSWORD || '';
+
+if (!resolvedCertificatePath) {
+  console.error(
+    '[EFI] No certificate could be resolved. Provide EFI_CERTIFICATE_PATH or EFI_CERTIFICATE_BASE64.'
+  );
+}
+
+if (resolvedCertificatePath && !fs.existsSync(resolvedCertificatePath)) {
+  console.error(
+    '[EFI] Certificate path does not exist:',
+    resolvedCertificatePath
+  );
+}
+
+// Strongly type the options object to align with the sdk-node-apis-efi expected shape.
+const options: {
+  client_id: string;
+  client_secret: string;
+  sandbox: boolean;
+  certificate?: string;
+  passphrase?: string;
+} = {
   client_id: process.env.EFI_CLIENT_ID!,
   client_secret: process.env.EFI_CLIENT_SECRET!,
   sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
-  certificate: resolveCertificatePath(),
-  passphrase: process.env.EFI_CERTIFICATE_PASSWORD || '',
+  certificate: resolvedCertificatePath,
 };
+// Only include passphrase if non-empty; some libraries mis-handle empty strings.
+if (passphrase) options.passphrase = passphrase;
 
 export const efiClient = new EfiPay(options);
 
@@ -102,7 +155,7 @@ export class EfiService {
         notification_url: `${getBaseUrl()}/api/webhooks/efi`,
       };
 
-  const response = await this.client.createOneStepCharge([], body);
+      const response = await this.client.createOneStepCharge([], body);
 
       return {
         id: response.data.charge_id.toString(),

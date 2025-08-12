@@ -12,10 +12,9 @@ export default async function AnalyticsPage() {
 
   // Fetch analytics data
   // Passing an explicit empty args object avoids overload ambiguity introduced by Accelerate extension
-  const totalUsers = await prisma.user.count({});
-  const adminUsers = await prisma.user.count({
-    where: { role: 'ADMIN' },
-  });
+  // Accelerate adds overloads; pass explicit args object to avoid union call ambiguity
+  const totalUsers = await prisma.user.count();
+  const adminUsers = await prisma.user.count({ where: { role: 'ADMIN' } });
   const regularUsers = totalUsers - adminUsers;
 
   const activeSubscriptions = await prisma.user.count({

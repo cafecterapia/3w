@@ -80,8 +80,8 @@ export default function TestEFIPage() {
             EFI Configuration Status
           </h2>
           <div className="mb-4 text-sm text-gray-600">
-            Live view of environment & connectivity. Refresh after changing
-            env vars / redeploy.
+            Live view of environment & connectivity. Refresh after changing env
+            vars / redeploy.
           </div>
           <Button
             variant="outline"
@@ -102,10 +102,7 @@ export default function TestEFIPage() {
                     label="Client Secret"
                     value={status.status.clientSecret}
                   />
-                  <StatusRow
-                    label="PIX Key"
-                    value={status.status.pixKey}
-                  />
+                  <StatusRow label="PIX Key" value={status.status.pixKey} />
                   <StatusRow
                     label="Webhook Secret"
                     value={status.status.webhookSecret}
@@ -132,9 +129,7 @@ export default function TestEFIPage() {
                 <div>
                   <Badge
                     ok={status.validation.ok}
-                    label={
-                      status.validation.ok ? 'Config OK' : 'Config Issues'
-                    }
+                    label={status.validation.ok ? 'Config OK' : 'Config Issues'}
                   />
                   {!status.validation.ok && (
                     <ul className="mt-2 list-disc pl-5 space-y-1 text-red-600">
