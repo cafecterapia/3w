@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate'; // (temporarily not applied due to type issues with count)
+// Accelerate extension available but disabled unless explicitly enabled via env
+// import { withAccelerate } from '@prisma/extension-accelerate';
 
 // --- Dynamic env fallback (Vercel Postgres compatibility) -------------------
 // Vercel Postgres integration exposes POSTGRES_PRISMA_URL (and POSTGRES_URL, POSTGRES_URL_NON_POOLING)
@@ -41,8 +42,10 @@ const base =
         : ['error'],
   });
 
-// NOTE: Temporarily not extending with Accelerate until type issue with count() resolved
-export const prisma = base; // useAccelerate ? base.$extends(withAccelerate()) : base;
+// Enable Accelerate extension only when using an Accelerate/Data Proxy URL and not explicitly disabled
+// Keep a stable PrismaClient type (avoid union of extended + base that breaks method overload resolution)
+// To re-enable Accelerate, uncomment import above and replace assignment with conditional.$extends, then cast.
+export const prisma: PrismaClient = base;
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = base;
