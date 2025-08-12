@@ -3,14 +3,47 @@ import EfiPay from 'sdk-node-apis-efi';
 import { getBaseUrl } from './utils';
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs';
+
+function resolveCertificatePath(): string | undefined {
+  if (!process.env.EFI_CERTIFICATE_PATH) return undefined;
+  const resolved = path.resolve(process.env.EFI_CERTIFICATE_PATH);
+  return resolved;
+}
+
+export function getEfiConfigStatus() {
+  const certPath = resolveCertificatePath();
+  const certExists = certPath ? fs.existsSync(certPath) : false;
+  return {
+    clientId: !!process.env.EFI_CLIENT_ID,
+    clientSecret: !!process.env.EFI_CLIENT_SECRET,
+    pixKey: !!process.env.EFI_PIX_KEY,
+    webhookSecret: !!process.env.EFI_WEBHOOK_SECRET,
+    certificatePath: certPath,
+    certificateExists: certExists,
+    hasPassphrase: (process.env.EFI_CERTIFICATE_PASSWORD || '') !== '',
+    environment: process.env.EFI_ENVIRONMENT || 'unset',
+    sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
+  };
+}
+
+export function validateEfiConfig(): { ok: boolean; issues: string[] } {
+  const status = getEfiConfigStatus();
+  const issues: string[] = [];
+  if (!status.clientId) issues.push('EFI_CLIENT_ID missing');
+  if (!status.clientSecret) issues.push('EFI_CLIENT_SECRET missing');
+  if (!status.pixKey) issues.push('EFI_PIX_KEY missing');
+  if (!status.certificatePath) issues.push('EFI_CERTIFICATE_PATH missing');
+  else if (!status.certificateExists)
+    issues.push(`EFI certificate not found at ${status.certificatePath}`);
+  return { ok: issues.length === 0, issues };
+}
 
 const options = {
   client_id: process.env.EFI_CLIENT_ID!,
   client_secret: process.env.EFI_CLIENT_SECRET!,
   sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
-  certificate: process.env.EFI_CERTIFICATE_PATH
-    ? path.resolve(process.env.EFI_CERTIFICATE_PATH)
-    : undefined,
+  certificate: resolveCertificatePath(),
   passphrase: process.env.EFI_CERTIFICATE_PASSWORD || '',
 };
 
@@ -69,7 +102,7 @@ export class EfiService {
         notification_url: `${getBaseUrl()}/api/webhooks/efi`,
       };
 
-      const response = await this.client.createOneStepCharge([], body);
+  const response = await this.client.createOneStepCharge([], body);
 
       return {
         id: response.data.charge_id.toString(),
@@ -121,6 +154,7 @@ export class EfiService {
         environment: process.env.EFI_ENVIRONMENT,
         balance: response.saldo,
         status: 'Active',
+        config: getEfiConfigStatus(),
       };
     } catch (error) {
       console.error('EFI connection test error:', error);
