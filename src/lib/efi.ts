@@ -5,43 +5,46 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 
-// In serverless (Vercel) deployments, relying on a static certificate file path may fail
-// if the certificate isn't bundled. We support providing the certificate as a base64
-// environment variable (EFI_CERTIFICATE_BASE64). On first access we decode and persist it
-// to a temporary location and reuse that path for the lifetime of the process.
+// In serverless (Vercel) deployments, relying on a certificate file path can fail.
+// Prefer providing the certificate via EFI_CERTIFICATE_BASE64 and pass it as base64
+// string with the appropriate flag. Fallback to reading a file path if needed locally.
 
-let materializedCertPath: string | undefined; // Cache across imports
-
-function materializeBase64Certificate(): string | undefined {
-  if (materializedCertPath) return materializedCertPath;
-  const b64 = process.env.EFI_CERTIFICATE_BASE64;
-  if (!b64) return undefined;
-  try {
-    const buffer = Buffer.from(b64.replace(/\s+/g, ''), 'base64');
-    // Basic sanity check (PKCS12 files usually start with 0x30 0x82)
-    if (buffer.length < 16) throw new Error('Decoded certificate too small');
-    const tmpDir = process.env.TMPDIR || '/tmp';
-    const filePath = path.join(tmpDir, 'efi-cert.p12');
-    fs.writeFileSync(filePath, buffer, { mode: 0o600 });
-    materializedCertPath = filePath;
-    return materializedCertPath;
-  } catch (err) {
-    console.error('Failed to decode EFI base64 certificate:', err);
-    return undefined;
+function getCertificateValue(): { value?: string; isBase64: boolean } {
+  const b64 = process.env.EFI_CERTIFICATE_BASE64?.trim();
+  if (b64) {
+    try {
+      // Validate base64 decodes to a plausible PKCS12
+      const buffer = Buffer.from(b64.replace(/\s+/g, ''), 'base64');
+      if (buffer.length < 16) throw new Error('Decoded certificate too small');
+      return { value: b64.replace(/\s+/g, ''), isBase64: true };
+    } catch (err) {
+      console.error('Failed to decode EFI base64 certificate:', err);
+      return { value: undefined, isBase64: false };
+    }
   }
+  const certPathEnv = process.env.EFI_CERTIFICATE_PATH;
+  if (certPathEnv) {
+    try {
+      const resolved = path.resolve(certPathEnv);
+      if (fs.existsSync(resolved)) return { value: resolved, isBase64: false };
+      console.error('[EFI] Certificate path does not exist:', resolved);
+    } catch (err) {
+      console.error('[EFI] Failed to read certificate file:', err);
+    }
+  }
+  return { value: undefined, isBase64: false };
 }
 
 function resolveCertificatePath(): string | undefined {
-  // Priority: base64 > explicit path
-  const fromBase64 = materializeBase64Certificate();
-  if (fromBase64) return fromBase64;
+  // Only for diagnostics, not for runtime use, since we prefer in-memory Buffer.
+  if (process.env.EFI_CERTIFICATE_BASE64) return 'from-base64-env';
   if (!process.env.EFI_CERTIFICATE_PATH) return undefined;
   return path.resolve(process.env.EFI_CERTIFICATE_PATH);
 }
 
 export function getEfiConfigStatus() {
   const certPath = resolveCertificatePath();
-  const certExists = certPath ? fs.existsSync(certPath) : false;
+  const certExists = certPath === 'from-base64-env' ? true : certPath ? fs.existsSync(certPath) : false;
   return {
     clientId: !!process.env.EFI_CLIENT_ID,
     clientSecret: !!process.env.EFI_CLIENT_SECRET,
@@ -62,43 +65,44 @@ export function validateEfiConfig(): { ok: boolean; issues: string[] } {
   if (!status.clientId) issues.push('EFI_CLIENT_ID missing');
   if (!status.clientSecret) issues.push('EFI_CLIENT_SECRET missing');
   if (!status.pixKey) issues.push('EFI_PIX_KEY missing');
-  if (!status.certificatePath) issues.push('EFI_CERTIFICATE_PATH missing');
-  else if (!status.certificateExists)
-    issues.push(`EFI certificate not found at ${status.certificatePath}`);
+  if (!status.certificateExists)
+    issues.push(
+      status.usingBase64
+        ? 'EFI_CERTIFICATE_BASE64 missing or invalid'
+        : status.certificatePath
+          ? `EFI certificate not found at ${status.certificatePath}`
+          : 'EFI certificate not provided (set EFI_CERTIFICATE_BASE64 or EFI_CERTIFICATE_PATH)'
+    );
   return { ok: issues.length === 0, issues };
 }
 
-const resolvedCertificatePath = resolveCertificatePath();
+const { value: certificateValue, isBase64 } = getCertificateValue();
 const passphrase = process.env.EFI_CERTIFICATE_PASSWORD || '';
 
-if (!resolvedCertificatePath) {
+if (!certificateValue) {
   console.error(
-    '[EFI] No certificate could be resolved. Provide EFI_CERTIFICATE_PATH or EFI_CERTIFICATE_BASE64.'
-  );
-}
-
-if (resolvedCertificatePath && !fs.existsSync(resolvedCertificatePath)) {
-  console.error(
-    '[EFI] Certificate path does not exist:',
-    resolvedCertificatePath
+    '[EFI] No certificate could be resolved. Provide EFI_CERTIFICATE_BASE64 or a valid EFI_CERTIFICATE_PATH.'
   );
 }
 
 // Strongly type the options object to align with the sdk-node-apis-efi expected shape.
+// The SDK accepts the certificate as a file path string or a Buffer. We pass Buffer for base64 mode.
 const options: {
   client_id: string;
   client_secret: string;
   sandbox: boolean;
   certificate?: string;
+  cert_base64?: boolean;
   passphrase?: string;
 } = {
   client_id: process.env.EFI_CLIENT_ID!,
   client_secret: process.env.EFI_CLIENT_SECRET!,
   sandbox: process.env.EFI_ENVIRONMENT === 'sandbox',
-  certificate: resolvedCertificatePath,
+  certificate: certificateValue,
 };
 // Only include passphrase if non-empty; some libraries mis-handle empty strings.
 if (passphrase) options.passphrase = passphrase;
+if (certificateValue && isBase64) options.cert_base64 = true;
 
 export const efiClient = new EfiPay(options);
 
