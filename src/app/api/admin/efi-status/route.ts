@@ -12,13 +12,19 @@ export async function GET(_req: NextRequest) {
   const validation = validateEfiConfig();
 
   // Optionally attempt a lightweight connection test only if config passes basic validation
-  let connectivity: { ok: boolean; message: string } = { ok: false, message: 'Skipped due to config issues' };
+  let connectivity: { ok: boolean; message: string } = {
+    ok: false,
+    message: 'Skipped due to config issues',
+  };
   if (validation.ok) {
     try {
       await efiService.testConnection();
       connectivity = { ok: true, message: 'Connection successful' };
     } catch (err: any) {
-      connectivity = { ok: false, message: err?.message || 'Connection failed' };
+      connectivity = {
+        ok: false,
+        message: err?.message || 'Connection failed',
+      };
     }
   }
 

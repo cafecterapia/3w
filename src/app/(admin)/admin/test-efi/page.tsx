@@ -76,11 +76,19 @@ export default function TestEFIPage() {
 
       <div className="grid gap-6 max-w-2xl">
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">EFI Configuration Status</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            EFI Configuration Status
+          </h2>
           <div className="mb-4 text-sm text-gray-600">
-            Live view of environment & connectivity. Refresh after changing env vars / redeploy.
+            Live view of environment & connectivity. Refresh after changing
+            env vars / redeploy.
           </div>
-          <Button variant="outline" className="mb-4" onClick={loadStatus} disabled={statusLoading}>
+          <Button
+            variant="outline"
+            className="mb-4"
+            onClick={loadStatus}
+            disabled={statusLoading}
+          >
             {statusLoading ? 'Refreshing...' : 'Refresh Status'}
           </Button>
           {status ? (
@@ -90,16 +98,44 @@ export default function TestEFIPage() {
               <div className="space-y-4 text-sm">
                 <div className="grid grid-cols-2 gap-2">
                   <StatusRow label="Client ID" value={status.status.clientId} />
-                  <StatusRow label="Client Secret" value={status.status.clientSecret} />
-                  <StatusRow label="PIX Key" value={status.status.pixKey} />
-                  <StatusRow label="Webhook Secret" value={status.status.webhookSecret} />
-                  <StatusRow label="Cert Path" value={!!status.status.certificatePath} raw={status.status.certificatePath} />
-                  <StatusRow label="Cert Exists" value={status.status.certificateExists} />
-                  <StatusRow label="Passphrase Set" value={status.status.hasPassphrase} />
-                  <StatusRow label="Environment" value={status.status.environment} raw={status.status.environment} />
+                  <StatusRow
+                    label="Client Secret"
+                    value={status.status.clientSecret}
+                  />
+                  <StatusRow
+                    label="PIX Key"
+                    value={status.status.pixKey}
+                  />
+                  <StatusRow
+                    label="Webhook Secret"
+                    value={status.status.webhookSecret}
+                  />
+                  <StatusRow
+                    label="Cert Path"
+                    value={!!status.status.certificatePath}
+                    raw={status.status.certificatePath}
+                  />
+                  <StatusRow
+                    label="Cert Exists"
+                    value={status.status.certificateExists}
+                  />
+                  <StatusRow
+                    label="Passphrase Set"
+                    value={status.status.hasPassphrase}
+                  />
+                  <StatusRow
+                    label="Environment"
+                    value={status.status.environment}
+                    raw={status.status.environment}
+                  />
                 </div>
                 <div>
-                  <Badge ok={status.validation.ok} label={status.validation.ok ? 'Config OK' : 'Config Issues'} />
+                  <Badge
+                    ok={status.validation.ok}
+                    label={
+                      status.validation.ok ? 'Config OK' : 'Config Issues'
+                    }
+                  />
                   {!status.validation.ok && (
                     <ul className="mt-2 list-disc pl-5 space-y-1 text-red-600">
                       {status.validation.issues.map((i: string) => (
@@ -109,7 +145,14 @@ export default function TestEFIPage() {
                   )}
                 </div>
                 <div>
-                  <Badge ok={status.connectivity.ok} label={status.connectivity.ok ? 'Connectivity OK' : 'Connectivity Failed'} />
+                  <Badge
+                    ok={status.connectivity.ok}
+                    label={
+                      status.connectivity.ok
+                        ? 'Connectivity OK'
+                        : 'Connectivity Failed'
+                    }
+                  />
                   <span className="ml-2">{status.connectivity.message}</span>
                 </div>
               </div>
@@ -206,7 +249,15 @@ export default function TestEFIPage() {
   );
 }
 
-function StatusRow({ label, value, raw }: { label: string; value: any; raw?: any }) {
+function StatusRow({
+  label,
+  value,
+  raw,
+}: {
+  label: string;
+  value: any;
+  raw?: any;
+}) {
   const display = raw ? raw : value ? 'Yes' : 'No';
   const color = value || raw ? 'text-green-700' : 'text-red-700';
   return (
@@ -219,7 +270,9 @@ function StatusRow({ label, value, raw }: { label: string; value: any; raw?: any
 
 function Badge({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <span className={`inline-block px-2 py-1 rounded text-xs ${ok ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+    <span
+      className={`inline-block px-2 py-1 rounded text-xs ${ok ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+    >
       {label}
     </span>
   );
