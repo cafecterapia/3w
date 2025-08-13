@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { PlaceholderPanel, StatusBar } from './ui';
-import type { PaymentData } from '../types';
+import type { PixPaymentData } from '../types';
 
 export function PixPaymentPanel({
   paymentData,
@@ -12,7 +12,7 @@ export function PixPaymentPanel({
   onCancel,
   paymentStatus,
 }: {
-  paymentData: PaymentData | null;
+  paymentData: PixPaymentData | null;
   copySuccess: boolean;
   onCopy: (text: string) => void;
   onCancel: () => void;
@@ -36,14 +36,29 @@ export function PixPaymentPanel({
         <>
           <div className="text-center">
             <div className="inline-block rounded-lg border bg-background p-4">
+              {/**
+               * Some backends return qrcodeImage as a raw base64 payload (iVBORw0...) while others
+               * may already include the full data URL prefix (data:image/png;base64,...).
+               * Normalize here to avoid duplicating the prefix and breaking the URL.
+               */}
               <Image
-                src={`data:image/png;base64,${paymentData.qrcodeImage}`}
+                src={(function () {
+                  const raw = (paymentData.qrcodeImage || '').trim();
+                  if (
+                    raw.startsWith('data:') ||
+                    raw.startsWith('http://') ||
+                    raw.startsWith('https://') ||
+                    raw.startsWith('blob:')
+                  ) {
+                    return raw;
+                  }
+                  return `data:image/png;base64,${raw}`;
+                })()}
                 alt="QR Code PIX"
                 width={256}
                 height={256}
                 className="h-64 w-64"
                 unoptimized
-                priority
               />
             </div>
             <p className="mt-2 text-xs text-gray-600">

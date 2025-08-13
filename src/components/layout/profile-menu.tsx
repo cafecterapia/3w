@@ -12,7 +12,12 @@ export function ProfileMenu({ userLabel }: ProfileMenuProps) {
 
   const closeMenu = () => {
     const el = detailsRef.current;
-    if (el?.open) el.removeAttribute('open');
+    if (el?.open) {
+      el.removeAttribute('open');
+      // Remove focus to ensure mobile browsers don't keep the visual pressed state
+      const summaryEl = el.querySelector('summary') as HTMLElement | null;
+      summaryEl?.blur();
+    }
   };
 
   useEffect(() => {
@@ -63,7 +68,11 @@ export function ProfileMenu({ userLabel }: ProfileMenuProps) {
   return (
     <div className="ml-auto">
       <details className="group relative" ref={detailsRef}>
-        <summary className="list-none cursor-pointer select-none rounded-md px-3 py-2 text-sm hover:bg-muted">
+        <summary
+          className="profile-trigger list-none cursor-pointer select-none rounded-md px-3 py-2 text-sm transition-colors group-open:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          aria-haspopup="menu"
+          aria-expanded={detailsRef.current?.open ? 'true' : 'false'}
+        >
           {/* Only the profile image (initial), no visible name */}
           <span
             className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-medium"
@@ -133,6 +142,14 @@ export function ProfileMenu({ userLabel }: ProfileMenuProps) {
             </li>
           </ul>
         </div>
+        {/* Desktop / pointer devices hover styling without causing sticky hover on touch */}
+        <style jsx>{`
+          @media (hover: hover) and (pointer: fine) {
+            .profile-trigger:hover {
+              background-color: var(--color-muted);
+            }
+          }
+        `}</style>
       </details>
     </div>
   );

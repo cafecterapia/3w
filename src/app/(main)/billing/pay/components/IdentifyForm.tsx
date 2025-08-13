@@ -5,11 +5,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 export interface IdentifyFormValues {
   name: string;
   cpf: string;
+  phone_number: string;
 }
 
 export function IdentifyForm({
   initialName,
   initialCpf,
+  initialPhone,
   disabled,
   error,
   isPending,
@@ -18,6 +20,7 @@ export function IdentifyForm({
 }: {
   initialName: string;
   initialCpf: string;
+  initialPhone?: string;
   disabled?: boolean;
   error?: string | null;
   isPending?: boolean;
@@ -27,8 +30,13 @@ export function IdentifyForm({
   const [formData, setFormData] = useState({
     name: initialName,
     cpf: initialCpf,
+    phone_number: initialPhone || '',
   });
-  const [touched, setTouched] = useState({ name: false, cpf: false });
+  const [touched, setTouched] = useState({
+    name: false,
+    cpf: false,
+    phone: false,
+  });
 
   // Keep internal state in sync when initial values change (e.g., after profile check)
   useEffect(() => {
@@ -45,6 +53,22 @@ export function IdentifyForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialName, initialCpf]);
 
+  // Keep phone in sync if provided later
+  useEffect(() => {
+    setFormData((prev) => {
+      const next = { ...prev } as any;
+      if (
+        !touched.phone &&
+        typeof initialPhone === 'string' &&
+        prev.phone_number !== initialPhone
+      ) {
+        next.phone_number = initialPhone || '';
+      }
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPhone]);
+
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 11) {
@@ -55,7 +79,14 @@ export function IdentifyForm({
 
   const isValid = useMemo(() => {
     const cpfNumbers = formData.cpf.replace(/\D/g, '');
-    return formData.name.trim().length >= 2 && cpfNumbers.length === 11;
+    const phoneDigits = formData.phone_number.replace(/\D/g, '');
+    // Accept 10 or 11 digits (landline or mobile with DDD), common BR formats
+    return (
+      formData.name.trim().length >= 2 &&
+      cpfNumbers.length === 11 &&
+      phoneDigits.length >= 10 &&
+      phoneDigits.length <= 11
+    );
   }, [formData]);
 
   return (
@@ -134,6 +165,33 @@ export function IdentifyForm({
           {touched.cpf && formData.cpf.replace(/\D/g, '').length !== 11 && (
             <p className="text-xs text-red-600">CPF deve ter 11 dígitos.</p>
           )}
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="phone" className="text-xs font-medium text-gray-700">
+            Telefone (com DDD) *
+          </label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            disabled={!!disabled || !!isPending}
+            value={formData.phone_number}
+            onChange={(e) =>
+              setFormData((p) => ({ ...p, phone_number: e.target.value }))
+            }
+            onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
+            placeholder="(11) 91234-5678"
+            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-0 placeholder:text-gray-400 focus:border-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
+          />
+          {touched.phone &&
+            (formData.phone_number.replace(/\D/g, '').length < 10 ||
+              formData.phone_number.replace(/\D/g, '').length > 11) && (
+              <p className="text-xs text-red-600">
+                Informe um telefone válido com DDD (10 a 11 dígitos).
+              </p>
+            )}
         </div>
 
         <button

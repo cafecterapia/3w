@@ -9,12 +9,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await (prisma as any).user.findUnique({
       where: { id: session.user.id },
       select: {
         id: true,
         name: true,
         cpf: true,
+        phone_number: true,
       },
     });
 
@@ -22,13 +23,14 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const isComplete = !!(user.name && user.cpf);
+    const isComplete = !!(user.name && user.cpf && user.phone_number);
 
     return NextResponse.json({
       isComplete,
       profile: {
         name: user.name,
         cpf: user.cpf,
+        phone_number: user.phone_number,
       },
     });
   } catch (error) {

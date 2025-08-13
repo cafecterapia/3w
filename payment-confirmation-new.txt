@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { StepDot, Divider } from './components/ui';
 import { IdentifyForm, IdentifyFormValues } from './components/IdentifyForm';
@@ -18,34 +18,23 @@ interface PaymentConfirmationProps {
   txid: string;
 }
 
-export default function PaymentConfirmation({
-  txid,
-}: PaymentConfirmationProps) {
+export default function PaymentConfirmation({ txid }: PaymentConfirmationProps) {
   const router = useRouter();
   const state = usePaymentState(txid);
-  // Destructure stable primitives for hook deps
-  const {
-    saveState,
-    phase: phaseDep,
-    selectedMethod: methodDep,
-    paymentStatus: statusDep,
-    currentTxid: txidDep,
-  } = state;
-
+  
   // Profile form state
   const [initialName, setInitialName] = useState('');
   const [initialCpf, setInitialCpf] = useState('');
   const [initialPhone, setInitialPhone] = useState('');
 
-  const { sessionStatus, isPending, createPaymentFromProfile, cancelPayment } =
-    usePaymentData({
-      state,
-      onProfileUpdate: useCallback((name, cpf, phone) => {
-        setInitialName(name);
-        setInitialCpf(cpf);
-        setInitialPhone(phone);
-      }, []),
-    });
+  const { sessionStatus, isPending, createPaymentFromProfile, cancelPayment } = usePaymentData({
+    state,
+    onProfileUpdate: (name, cpf, phone) => {
+      setInitialName(name);
+      setInitialCpf(cpf);
+      setInitialPhone(phone);
+    },
+  });
 
   // Navigation guard - only active during payment phase
   const { goTo } = usePaymentNavGuard({
@@ -58,29 +47,26 @@ export default function PaymentConfirmation({
     txid: state.currentTxid,
     isActive: state.phase === 'pay' && state.paymentStatus === 'pending',
     method: state.selectedMethod,
-    onStatusChange: useCallback(
-      (status) => {
-        state.setPaymentStatus(status);
-        // Clear state on any terminal status
-        state.clearState();
-      },
-      [state]
-    ),
-    onError: useCallback((error) => state.setError(error), [state]),
+    onStatusChange: (status) => {
+      state.setPaymentStatus(status);
+      // Clear state on any terminal status
+      state.clearState();
+    },
+    onError: state.setError,
     onCancel: cancelPayment,
   });
 
   // Save state on significant changes
   useEffect(() => {
-    saveState();
-  }, [phaseDep, methodDep, statusDep, txidDep, saveState]);
+    state.saveState();
+  }, [state.phase, state.selectedMethod, state.paymentStatus]);
 
   // Clear state on terminal statuses
   useEffect(() => {
     if (state.paymentStatus !== 'pending') {
       state.clearState();
     }
-  }, [state.paymentStatus, state]);
+  }, [state.paymentStatus]);
 
   const handleIdentifySubmit = async (values: IdentifyFormValues) => {
     if (!state.requiresProfile) {
@@ -131,7 +117,7 @@ export default function PaymentConfirmation({
 
   const handleMethodSelect = (method: typeof state.selectedMethod) => {
     state.setSelectedMethod(method);
-
+    
     if (method === 'pix') {
       state.setPhase('pay');
     } else if (method === 'credit') {
@@ -189,9 +175,7 @@ export default function PaymentConfirmation({
         setTimeout(() => state.setCopySuccess(false), 2000);
       } catch (fallbackErr) {
         console.error('Fallback copy failed:', fallbackErr);
-        alert(
-          'Não foi possível copiar automaticamente. Copie manualmente a chave PIX.'
-        );
+        alert('Não foi possível copiar automaticamente. Copie manualmente a chave PIX.');
       }
       document.body.removeChild(textArea);
     }
@@ -205,9 +189,7 @@ export default function PaymentConfirmation({
           <span className="absolute inset-0 rounded-full border-2 border-gray-200"></span>
           <span className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></span>
         </div>
-        <p className="text-sm text-gray-600">
-          Carregando informações do pagamento...
-        </p>
+        <p className="text-sm text-gray-600">Carregando informações do pagamento...</p>
       </div>
     );
   }
@@ -218,11 +200,7 @@ export default function PaymentConfirmation({
       <div className="mx-auto max-w-lg">
         <div className="rounded-lg border bg-gray-50 p-4">
           <div className="flex items-start gap-3">
-            <svg
-              className="h-5 w-5 text-gray-900"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
+            <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 9v4m0 4h.01M10.29 3.86l-7.5 12.99A2 2 0 004.5 20h15a2 2 0 001.71-3.15l-7.5-12.99a2 2 0 00-3.42 0z"
                 stroke="currentColor"
@@ -256,11 +234,7 @@ export default function PaymentConfirmation({
       <div className="mx-auto max-w-lg">
         <div className="rounded-lg border bg-gray-50 p-4">
           <div className="flex items-start gap-3">
-            <svg
-              className="h-5 w-5 text-gray-900"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
+            <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 9v4m0 4h.01M10.29 3.86l-7.5 12.99A2 2 0 004.5 20h15a2 2 0 001.71-3.15l-7.5-12.99a2 2 0 00-3.42 0z"
                 stroke="currentColor"
@@ -291,24 +265,15 @@ export default function PaymentConfirmation({
       {/* Progress header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <StepDot
-            active={state.phase === 'identify'}
-            done={state.phase !== 'identify'}
-          >
+          <StepDot active={state.phase === 'identify'} done={state.phase !== 'identify'}>
             Identificação
           </StepDot>
           <Divider />
-          <StepDot
-            active={state.phase === 'method'}
-            done={state.phase === 'pay'}
-          >
+          <StepDot active={state.phase === 'method'} done={state.phase === 'pay'}>
             Método
           </StepDot>
           <Divider />
-          <StepDot
-            active={state.phase === 'pay'}
-            done={state.paymentStatus === 'paid'}
-          >
+          <StepDot active={state.phase === 'pay'} done={state.paymentStatus === 'paid'}>
             Pagamento
           </StepDot>
         </div>
@@ -327,11 +292,7 @@ export default function PaymentConfirmation({
           <div className="rounded-lg border bg-card p-4">
             <div className="mb-3 flex items-center gap-2 justify-between">
               <div className="flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 text-gray-900"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
+                <svg className="h-4 w-4 text-gray-900" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zM4 22a8 8 0 0116 0"
                     stroke="currentColor"
@@ -383,17 +344,11 @@ export default function PaymentConfirmation({
             onSelect={handleMethodSelect}
           >
             {/* Inner content area */}
-            <div
-              className={`mt-4 border-t pt-4 ${state.phase === 'method' ? 'opacity-60' : ''}`}
-            >
+            <div className={`mt-4 border-t pt-4 ${state.phase === 'method' ? 'opacity-60' : ''}`}>
               {/* Method selection placeholder */}
               {state.phase === 'method' && (
                 <div className="flex h-full flex-col items-center justify-center text-center py-10">
-                  <svg
-                    className="h-10 w-10 text-gray-900"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
+                  <svg className="h-10 w-10 text-gray-900" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M12 6v12M6 12h12"
                       stroke="currentColor"
@@ -401,9 +356,7 @@ export default function PaymentConfirmation({
                       strokeLinecap="round"
                     />
                   </svg>
-                  <h3 className="mt-3 text-base font-medium">
-                    Selecione o método
-                  </h3>
+                  <h3 className="mt-3 text-base font-medium">Selecione o método</h3>
                   <p className="mt-1 max-w-sm text-sm text-gray-600">
                     Escolha como deseja realizar o pagamento para avançar.
                   </p>
@@ -415,11 +368,7 @@ export default function PaymentConfirmation({
                 <>
                   {state.selectedMethod === 'pix' && (
                     <PixPaymentPanel
-                      paymentData={
-                        state.paymentData?.kind === 'pix'
-                          ? state.paymentData
-                          : null
-                      }
+                      paymentData={state.paymentData?.kind === 'pix' ? state.paymentData : null}
                       copySuccess={state.copySuccess}
                       onCopy={copyToClipboard}
                       onCancel={handleCancel}
@@ -429,19 +378,11 @@ export default function PaymentConfirmation({
 
                   {state.selectedMethod === 'credit' && (
                     <CardPaymentPanel
-                      paymentData={
-                        state.paymentData?.kind === 'card'
-                          ? state.paymentData
-                          : null
-                      }
+                      paymentData={state.paymentData?.kind === 'card' ? state.paymentData : null}
                       onCancel={handleCancel}
                       paymentStatus={state.paymentStatus}
                       onCreated={({ chargeId, paymentUrl }) => {
-                        state.setPaymentData({
-                          kind: 'card',
-                          chargeId,
-                          paymentUrl,
-                        });
+                        state.setPaymentData({ kind: 'card', chargeId, paymentUrl });
                         state.setCurrentTxid(chargeId);
                         const newUrl = `${window.location.pathname}?txid=${chargeId}`;
                         window.history.replaceState({}, '', newUrl);
@@ -451,11 +392,7 @@ export default function PaymentConfirmation({
 
                   {state.selectedMethod === 'boleto' && (
                     <BoletoPaymentPanel
-                      paymentData={
-                        state.paymentData?.kind === 'boleto'
-                          ? state.paymentData
-                          : null
-                      }
+                      paymentData={state.paymentData?.kind === 'boleto' ? state.paymentData : null}
                       onCancel={handleCancel}
                       paymentStatus={state.paymentStatus}
                     />
@@ -467,11 +404,7 @@ export default function PaymentConfirmation({
               {state.paymentStatus === 'paid' && (
                 <div className="text-center py-10">
                   <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                    <svg
-                      className="h-8 w-8 text-gray-900"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
+                    <svg className="h-8 w-8 text-gray-900" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M20 7L9 18l-5-5"
                         stroke="currentColor"
@@ -513,11 +446,7 @@ export default function PaymentConfirmation({
               {state.paymentStatus === 'expired' && (
                 <div className="text-center py-10">
                   <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                    <svg
-                      className="h-8 w-8 text-gray-900"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
+                    <svg className="h-8 w-8 text-gray-900" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M6 18L18 6M6 6l12 12"
                         stroke="currentColor"
@@ -527,9 +456,7 @@ export default function PaymentConfirmation({
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold tracking-tight">
-                    Pagamento expirado
-                  </h3>
+                  <h3 className="text-xl font-semibold tracking-tight">Pagamento expirado</h3>
                   <p className="mt-1 text-sm text-gray-600">
                     O tempo para concluir o pagamento foi excedido.
                   </p>
@@ -551,11 +478,7 @@ export default function PaymentConfirmation({
               {state.paymentStatus === 'cancelled' && (
                 <div className="text-center py-10">
                   <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                    <svg
-                      className="h-8 w-8 text-gray-900"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
+                    <svg className="h-8 w-8 text-gray-900" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M6 18L18 6M6 6l12 12"
                         stroke="currentColor"
@@ -565,9 +488,7 @@ export default function PaymentConfirmation({
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold tracking-tight">
-                    Pagamento cancelado
-                  </h3>
+                  <h3 className="text-xl font-semibold tracking-tight">Pagamento cancelado</h3>
                   <p className="mt-1 text-sm text-gray-600">
                     Você pode tentar novamente quando desejar.
                   </p>

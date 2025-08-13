@@ -6,21 +6,28 @@
 ├── .gitignore              # Git ignore configuration
 ├── .prettierignore         # Prettier ignore configuration
 ├── .prettierrc.json        # Prettier configuration
+├── build.log               # Build output log
+├── check-efi-config.js     # EFI configuration checker script
 ├── cypress.config.ts       # Cypress E2E testing configuration
 ├── next-env.d.ts           # Next.js TypeScript definitions
+├── next.config.ts          # Next.js configuration
 ├── package.json            # Project dependencies and scripts
 ├── package-lock.json       # Package lock file
 ├── postcss.config.js       # PostCSS configuration (for Tailwind)
-├── test-db.js              # Database testing script
-├── test-pricing.js         # Pricing testing script
+├── tailwind.config.js      # Tailwind CSS configuration
 ├── test-setup.ts           # Test setup configuration
 ├── tsconfig.json           # TypeScript configuration
 ├── tsconfig.tsbuildinfo    # TypeScript build info
+├── type-test.ts            # TypeScript type testing file
 └── vitest.config.ts        # Vitest testing configuration
 
 ├── .vscode/
 │   ├── settings.json       # VS Code workspace settings
 │   └── tasks.json          # VS Code tasks configuration
+
+├── certs/                  # SSL certificates for EFI integration
+│   ├── producao-810733-3WT.p12        # EFI production certificate
+│   └── producao-810733-3WT.p12.b64    # Base64 encoded certificate
 
 ├── ABC-structural/            # AI command documentation
 │   ├── Backend.txt
@@ -55,7 +62,13 @@
 │       │   └── migration.sql
 │       ├── 20250804100258_add_cpf_field/
 │       │   └── migration.sql
-│       └── 20250805000000_add_payment_created_at/
+│       ├── 20250805000000_add_payment_created_at/
+│       │   └── migration.sql
+│       ├── 20250806032415_add_qr_code_fields/
+│       │   └── migration.sql
+│       ├── 20250806144552_add_class_tracking_fields/
+│       │   └── migration.sql
+│       └── 20250808142306_add_invoice_model/
 │           └── migration.sql
 
 ├── public/
@@ -65,7 +78,9 @@
 │   └── sw.js               # Service Worker for push notifications & offline capabilities
 
 ├── scripts/                # Utility scripts
-│   └── create-admin.ts     # Script to create admin users
+│   ├── check-env.mjs       # Environment validation script
+│   ├── create-admin.ts     # Script to create admin users
+│   └── run-next-build.cjs  # Next.js build runner script
 
 └── src/
     ├── __tests__/          # Test files
@@ -112,13 +127,21 @@
     │   │   ├── layout.tsx      # Shared layout for the main app (e.g., with sidebar)
     │   │   ├── billing/
     │   │   │   ├── page.tsx    # Page to manage subscription, view invoices
+    │   │   │   ├── invoices/
+    │   │   │   │   ├── page.tsx # Invoices list page
+    │   │   │   │   └── [id]/
+    │   │   │   │       └── page.tsx # Individual invoice page
     │   │   │   ├── manage/
     │   │   │   │   ├── page.tsx # Payment management page
     │   │   │   │   ├── payment-management-content.tsx # Client-side payment management content
     │   │   │   │   └── payment-management-provider.tsx # Payment management provider
-    │   │   │   └── pay/
-    │   │   │       ├── page.tsx # Payment processing page
-    │   │   │       └── payment-confirmation.tsx # Payment confirmation component
+    │   │   │   ├── pay/
+    │   │   │   │   ├── page.tsx # Payment processing page
+    │   │   │   │   └── payment-confirmation.tsx # Payment confirmation component
+    │   │   │   └── plan/
+    │   │   │       └── page.tsx # Plan selection/change page
+    │   │   ├── calendar/
+    │   │   │   └── page.tsx    # Calendar management page
     │   │   ├── dashboard/
     │   │   │   ├── page.tsx    # Main dashboard after login
     │   │   │   └── subscription-status-widget.tsx # Subscription status widget component
@@ -141,14 +164,20 @@
     │   ├── api/                # API Routes (Your Backend-for-Frontend - BFF)
     │   │   ├── admin/
     │   │   │   ├── route.ts    # Admin-related API endpoints
+    │   │   │   ├── efi-status/
+    │   │   │   │   └── route.ts # EFI status check endpoint
+    │   │   │   ├── health/
+    │   │   │   │   └── route.ts # Health check endpoint
     │   │   │   ├── test-efi-connection/
     │   │   │   │   └── route.ts # EFI connection testing endpoint
     │   │   │   └── test-subscription/
     │   │   │       └── route.ts # Subscription testing endpoint
     │   │   │
     │   │   ├── auth/
-    │   │   │   └── [...nextauth]/
-    │   │   │       └── route.ts # Auth.js catch-all route
+    │   │   │   ├── [...nextauth]/
+    │   │   │   │   └── route.ts # Auth.js catch-all route
+    │   │   │   └── change-password/
+    │   │   │       └── route.ts # Password change endpoint
     │   │   │
     │   │   ├── debug/
     │   │   │   ├── db/
@@ -161,26 +190,44 @@
     │   │   │   │   └── route.ts # Billing settings management
     │   │   │   ├── cancel/
     │   │   │   │   └── route.ts # Payment cancellation endpoint
+    │   │   │   ├── create-boleto/
+    │   │   │   │   └── route.ts # Boleto payment creation endpoint
+    │   │   │   ├── create-card/
+    │   │   │   │   └── route.ts # Card payment creation endpoint
     │   │   │   ├── create-class-subscription/
     │   │   │   │   └── route.ts # Class subscription creation endpoint
+    │   │   │   ├── create-from-profile/
+    │   │   │   │   └── route.ts # Payment from profile endpoint
     │   │   │   ├── create-subscription/
     │   │   │   │   └── route.ts # Server-side logic to create a subscription with Efi
     │   │   │   ├── manage-subscription/
     │   │   │   │   └── route.ts # Logic to create a portal link to manage billing
+    │   │   │   ├── pay-card/
+    │   │   │   │   └── route.ts # Card payment processing endpoint
     │   │   │   ├── payment-methods/
     │   │   │   │   └── route.ts # Payment methods management
-    │   │   │   └── status/
-    │   │   │       └── route.ts # Payment status endpoint
+    │   │   │   ├── status/
+    │   │   │   │   └── route.ts # Payment status endpoint
+    │   │   │   └── token-config/
+    │   │   │       └── route.ts # Payment token configuration endpoint
     │   │   │
     │   │   ├── profile/
+    │   │   │   ├── check/
+    │   │   │   │   └── route.ts # Profile validation endpoint
+    │   │   │   ├── delete/
+    │   │   │   │   └── route.ts # Profile deletion endpoint
+    │   │   │   ├── save/
+    │   │   │   │   └── route.ts # Profile save endpoint
     │   │   │   └── update/
     │   │   │       └── route.ts # Profile update endpoint
     │   │   │
     │   │   ├── push/
     │   │   │   ├── send-notification/
     │   │   │   │   └── route.ts # Secure endpoint to trigger a push notification
-    │   │   │   └── subscribe/
-    │   │   │       └── route.ts # Logic to save a user's push subscription
+    │   │   │   ├── subscribe/
+    │   │   │   │   └── route.ts # Logic to save a user's push subscription
+    │   │   │   └── unsubscribe/
+    │   │   │       └── route.ts # Push notification unsubscribe endpoint
     │   │   │
     │   │   └── webhooks/
     │   │       └── efi/
@@ -195,6 +242,13 @@
     │   │
     │   ├── admin/            # Admin-specific components
     │   │   └── payment-settings-form.tsx # Payment settings form component
+    │   │
+    │   ├── calendar/         # Calendar-specific components
+    │   │   ├── compact-picker.tsx # Compact date picker component
+    │   │   ├── day-view.tsx  # Day view calendar component
+    │   │   ├── index.ts      # Calendar components barrel exports
+    │   │   ├── ui-components.tsx # Calendar UI components
+    │   │   └── week-view.tsx # Week view calendar component
     │   │
     │   ├── ui/               # Reusable, generic UI components (Button, Card, Input, etc.)
     │   │   ├── button.tsx
@@ -223,6 +277,8 @@
     ├── lib/
     │   ├── admin-utils.ts    # Admin-specific utility functions
     │   ├── auth.ts           # Auth.js configuration and options
+    │   ├── billing.ts        # Billing and subscription utility functions
+    │   ├── calendar-utils.ts # Calendar utility functions
     │   ├── data.ts           # Data access layer and utility functions
     │   ├── efi.ts            # Efi SDK initialization and helper functions
     │   ├── pricing-constants.ts # Pricing plans and constants
@@ -231,5 +287,6 @@
     │   └── utils.ts          # Utility functions (e.g., formatting dates, currency)
     │
     └── types/
+        ├── calendar.ts       # Calendar-related TypeScript types
         ├── index.ts          # Global TypeScript types (e.g., for subscription plans)
         └── next-auth.d.ts    # NextAuth type definitions

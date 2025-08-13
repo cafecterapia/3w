@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, cpf } = await request.json();
+    const { name, cpf, phone_number } = await request.json();
 
     if (!name || !cpf) {
       return NextResponse.json(
@@ -49,12 +49,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Normalize phone
+    let normalizedPhone: string | undefined;
+    if (typeof phone_number === 'string') {
+      const digits = phone_number.replace(/\D/g, '');
+      if (digits.length < 10 || digits.length > 11) {
+        return NextResponse.json(
+          { success: false, message: 'Phone number must have 10-11 digits.' },
+          { status: 400 }
+        );
+      }
+      normalizedPhone = digits;
+    }
+
     // Update user profile
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
         name: name.trim(),
         cpf: cpfNumbers,
+        ...(normalizedPhone ? { phone_number: normalizedPhone } : {}),
       },
     });
 
@@ -62,9 +76,10 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Profile updated successfully.',
       user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        cpf: updatedUser.cpf,
+        id: (updatedUser as any).id,
+        name: (updatedUser as any).name,
+        cpf: (updatedUser as any).cpf,
+        phone_number: (updatedUser as any).phone_number ?? null,
       },
     });
   } catch (error) {
