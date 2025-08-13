@@ -12,11 +12,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email } = await request.json();
+    const { name, email, phone_number } = await request.json();
 
     const data: any = {};
     if (typeof name === 'string') data.name = name.trim();
     if (typeof email === 'string') data.email = email.trim();
+    if (typeof phone_number === 'string')
+      data.phone_number = phone_number.replace(/\D/g, '');
 
     if (!Object.keys(data).length) {
       return NextResponse.json(

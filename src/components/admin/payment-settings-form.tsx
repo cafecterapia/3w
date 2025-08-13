@@ -6,6 +6,7 @@ interface PaymentSettings {
   efiClientId: string;
   efiClientSecret: string;
   efiEnvironment: 'sandbox' | 'production';
+  efiPayeeCode: string;
   efiWebhookSecret: string;
   bankAccount: {
     bank: string;
@@ -20,6 +21,7 @@ export function PaymentSettingsForm() {
     efiClientId: '',
     efiClientSecret: '',
     efiEnvironment: 'sandbox',
+    efiPayeeCode: '',
     efiWebhookSecret: '',
     bankAccount: {
       bank: '',
@@ -81,6 +83,26 @@ export function PaymentSettingsForm() {
           EFI API Configuration
         </h3>
         <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Payee Code
+            </label>
+            <input
+              type="text"
+              value={settings.efiPayeeCode}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  efiPayeeCode: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Your EFI Payee Code"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Required for client-side card tokenization (payment-token-efi).
+            </p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Client ID
@@ -309,6 +331,7 @@ export function PaymentSettingsForm() {
           {`EFI_CLIENT_ID=${settings.efiClientId || 'your-efi-client-id'}
 EFI_CLIENT_SECRET=${settings.efiClientSecret || 'your-efi-client-secret'}
 EFI_ENVIRONMENT=${settings.efiEnvironment}
+EFI_PAYEE_CODE=${settings.efiPayeeCode || 'your-efi-payee-code'}
 EFI_WEBHOOK_SECRET=${settings.efiWebhookSecret || 'your-efi-webhook-secret'}`}
         </pre>
         <p className="text-xs text-gray-600 mt-2">

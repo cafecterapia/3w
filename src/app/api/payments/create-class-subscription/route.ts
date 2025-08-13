@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { efi } from '@/lib/efi';
+import { efi, validateEfiConfig } from '@/lib/efi';
 import { PlanSelection } from '@/types';
 import { calculatePricing } from '@/lib/pricing-constants';
 
@@ -87,27 +87,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check if EFI payment system is configured
-    if (
-      !process.env.EFI_CLIENT_ID ||
-      !process.env.EFI_CLIENT_SECRET ||
-      !process.env.EFI_PIX_KEY
-    ) {
-      console.error(
-        'EFI Payment system not configured. Missing environment variables:',
-        {
-          EFI_CLIENT_ID: !!process.env.EFI_CLIENT_ID,
-          EFI_CLIENT_SECRET: !!process.env.EFI_CLIENT_SECRET,
-          EFI_PIX_KEY: !!process.env.EFI_PIX_KEY,
-          EFI_CERTIFICATE_PATH: !!process.env.EFI_CERTIFICATE_PATH,
-        }
-      );
+    // Check if EFI payment system is configured (PIX requires full config incl. certificate)
+    const efiCfg = validateEfiConfig();
+    if (!efiCfg.ok) {
+      console.error('EFI Payment system not configured:', efiCfg.issues);
       return NextResponse.json(
         {
           success: false,
           message:
             'Payment system is currently unavailable. Please contact support or try again later.',
           error: 'PAYMENT_SYSTEM_NOT_CONFIGURED',
+          issues: efiCfg.issues,
         },
         { status: 503 }
       );
@@ -124,7 +114,7 @@ export async function POST(request: NextRequest) {
       valor: {
         original: expectedPricing.finalPrice.toFixed(2),
       },
-      chave: process.env.EFI_PIX_KEY,
+      chave: process.env.EFI_PIX_KEY as string,
       solicitacaoPagador: `Plano de ${planSelection.classCount} aulas.`,
     };
 
@@ -159,14 +149,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Generic error
-      const errorMessage =
+      // Detect invalid token/auth
+      const msg =
         (efiError as any)?.response?.data?.mensagem ||
+        (efiError as any)?.message ||
         'Payment system temporarily unavailable';
-      return NextResponse.json(
-        { success: false, message: errorMessage },
-        { status: 503 }
-      );
+      const status = /invalid[_ ]token|unauthorized|auth/i.test(String(msg))
+        ? 503
+        : 503;
+      return NextResponse.json({ success: false, message: msg }, { status });
     }
 
     // Store payment data in database before generating QR code
@@ -181,6 +172,20 @@ export async function POST(request: NextRequest) {
         classCount: planSelection.classCount, // Store the actual number of classes purchased
         schedulingOption: planSelection.schedulingOption, // Store the scheduling type ('recurring' or 'on-demand')
         classesUsed: 0, // Reset classes used count for new purchase
+      },
+    });
+
+    // Create Payment record for consistency and better tracking
+    await (prisma as any).payment.create({
+      data: {
+        userId: user.id,
+        provider: 'efi',
+        method: 'pix',
+        externalId: efiResponse.txid,
+        status: 'PENDING',
+        amount: Math.round(expectedPricing.finalPrice * 100), // Amount in cents
+        currency: 'BRL',
+        pixLocationId: efiResponse.loc?.id || null,
       },
     });
 
@@ -209,6 +214,15 @@ export async function POST(request: NextRequest) {
       data: {
         qrCodeImage: qrCodeResponse.imagemQrcode,
         qrCodeText: qrCodeResponse.qrcode,
+      },
+    });
+
+    // Update Payment record with QR code data
+    await (prisma as any).payment.updateMany({
+      where: { userId: user.id, externalId: efiResponse.txid },
+      data: {
+        pixQrImage: qrCodeResponse.imagemQrcode,
+        pixQrText: qrCodeResponse.qrcode,
       },
     });
 

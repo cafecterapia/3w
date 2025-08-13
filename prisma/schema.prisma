@@ -21,6 +21,7 @@ model User {
   pushSubscription   String?
   role               UserRole  @default(USER)
   cpf                String?   @unique
+  phone_number       String?
   paymentCreatedAt   DateTime?
   efiLocationId      Int?
   qrCodeImage        String?
@@ -31,6 +32,7 @@ model User {
   accounts           Account[]
   invoices           Invoice[]
   sessions           Session[]
+  payments           Payment[]
 }
 
 model Account {
@@ -87,4 +89,35 @@ model Invoice {
 enum UserRole {
   USER
   ADMIN
+}
+
+// Store individual payment attempts across methods (pix, card, boleto)
+model Payment {
+  id            String   @id @default(cuid())
+  userId        String
+  provider      String   @default("efi")
+  method        String   // 'pix' | 'card' | 'boleto'
+  externalId    String   // PIX txid or numeric charge_id as string
+  status        String   // 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED' | 'FAILED'
+  amount        Int      // in cents
+  currency      String   @default("BRL")
+  // PIX specifics
+  pixLocationId Int?
+  pixQrImage    String?
+  pixQrText     String?
+  // Boleto specifics
+  boletoLink    String?
+  boletoPdfUrl  String?
+  boletoBarcode String?
+  // Card specifics
+  cardBrand     String?
+  cardLast4     String?
+  paymentUrl    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([externalId])
 }

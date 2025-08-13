@@ -141,6 +141,28 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Get pricing for amount calculation
+    const pricing = calculatePricing(
+      user.classCount || 1,
+      (user.schedulingOption as 'recurring' | 'on-demand') || 'recurring'
+    );
+
+    // Create Payment record for consistency and better tracking
+    await (prisma as any).payment.create({
+      data: {
+        userId: user.id,
+        provider: 'efi',
+        method: 'pix',
+        externalId: efiResponse.txid,
+        status: 'PENDING',
+        amount: Math.round(pricing.finalPrice * 100), // Amount in cents
+        currency: 'BRL',
+        pixLocationId: efiResponse.loc?.id || null,
+        pixQrImage: qrCodeResponse.imagemQrcode,
+        pixQrText: qrCodeResponse.qrcode,
+      },
+    });
+
     return NextResponse.json({
       success: true,
       paymentData: {

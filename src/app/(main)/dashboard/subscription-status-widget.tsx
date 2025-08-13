@@ -26,12 +26,12 @@ function Card({ children }: { children: React.ReactNode }) {
         boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
         padding: 16,
       }}
-      className="mb-8 sm:mb-10"
+      className="mb-8 sm:mb-10 subscription-card"
     >
       {children}
-      <style jsx global>{`
+      <style jsx>{`
         @supports (backdrop-filter: blur(8px)) {
-          section {
+          .subscription-card {
             background-color: color-mix(
               in oklab,
               var(--color-card) 88%,

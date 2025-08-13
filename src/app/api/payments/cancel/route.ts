@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { efiService } from '@/lib/efi';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,8 +35,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if the txid matches the user's subscription ID
-    if (user.efiSubscriptionId !== txid) {
+    // Check for legacy match or Payment record
+    const paymentRecord = await (prisma as any).payment.findFirst({
+      where: { userId: user.id, externalId: txid },
+    });
+    if (user.efiSubscriptionId !== txid && !paymentRecord) {
       return NextResponse.json(
         { success: false, message: 'Payment not found for this user.' },
         { status: 404 }
@@ -44,6 +48,10 @@ export async function POST(request: NextRequest) {
 
     // Only cancel if the subscription is still pending
     if (user.subscriptionStatus === 'PENDING') {
+      // Attempt provider cancel for non-PIX generic charges (best-effort)
+      if (paymentRecord && paymentRecord.method !== 'pix') {
+        await efiService.cancelGenericCharge(txid).catch(() => {});
+      }
       await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -56,6 +64,13 @@ export async function POST(request: NextRequest) {
           efiLocationId: null,
         },
       });
+
+      if (paymentRecord) {
+        await (prisma as any).payment.update({
+          where: { id: paymentRecord.id },
+          data: { status: 'CANCELLED' },
+        });
+      }
 
       return NextResponse.json({
         success: true,
