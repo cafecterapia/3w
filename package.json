@@ -33,11 +33,12 @@
   "license": "ISC",
   "dependencies": {
     "@auth/prisma-adapter": "2.10.0",
-    "@prisma/client": "6.13.0",
+    "@prisma/client": "6.14.0",
     "@prisma/extension-accelerate": "2.0.2",
     "@tailwindcss/postcss": "4.1.11",
     "bcryptjs": "3.0.2",
     "date-fns": "4.1.0",
+    "lucide-react": "^0.539.0",
     "next": "^15.4.6",
     "next-auth": "5.0.0-beta.29",
     "payment-token-efi": "^3.2.0",
@@ -45,6 +46,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "sdk-node-apis-efi": "1.2.25",
+    "slugify": "^1.6.6",
     "web-push": "3.6.7",
     "zod": "4.0.17"
   },

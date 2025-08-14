@@ -2,17 +2,20 @@
 ├── .env                    # Environment variables
 ├── .env.example            # Environment variables template
 ├── .env.local              # Local environment variables (API keys, database URL)
+├── .env.vercel-sync.tmp    # Temporary Vercel sync file
 ├── .eslintrc.json          # ESLint configuration
 ├── .gitignore              # Git ignore configuration
 ├── .prettierignore         # Prettier ignore configuration
 ├── .prettierrc.json        # Prettier configuration
 ├── build.log               # Build output log
-├── check-efi-config.js     # EFI configuration checker script
 ├── cypress.config.ts       # Cypress E2E testing configuration
+├── FileFolderStructure.txt # This documentation file
 ├── next-env.d.ts           # Next.js TypeScript definitions
 ├── next.config.ts          # Next.js configuration
 ├── package.json            # Project dependencies and scripts
 ├── package-lock.json       # Package lock file
+├── payment-confirmation-new.txt # New payment confirmation template
+├── payment-confirmation-old.txt # Old payment confirmation template  
 ├── postcss.config.js       # PostCSS configuration (for Tailwind)
 ├── tailwind.config.js      # Tailwind CSS configuration
 ├── test-setup.ts           # Test setup configuration
@@ -25,14 +28,12 @@
 │   ├── settings.json       # VS Code workspace settings
 │   └── tasks.json          # VS Code tasks configuration
 
+├── .vercel/                # Vercel deployment configuration
+│   └── project.json        # Vercel project configuration
+
 ├── certs/                  # SSL certificates for EFI integration
 │   ├── producao-810733-3WT.p12        # EFI production certificate
 │   └── producao-810733-3WT.p12.b64    # Base64 encoded certificate
-
-├── ABC-structural/            # AI command documentation
-│   ├── Backend.txt
-│   ├── FileFolderStructure.txt
-│   └── register.txt
 
 ├── cypress/                # End-to-end testing with Cypress
 │   ├── downloads/          # Downloaded files during tests (empty)
@@ -68,7 +69,9 @@
 │       │   └── migration.sql
 │       ├── 20250806144552_add_class_tracking_fields/
 │       │   └── migration.sql
-│       └── 20250808142306_add_invoice_model/
+│       ├── 20250808142306_add_invoice_model/
+│       │   └── migration.sql
+│       └── 20250812191050_add_phone_number_field/
 │           └── migration.sql
 
 ├── public/
@@ -80,7 +83,9 @@
 ├── scripts/                # Utility scripts
 │   ├── check-env.mjs       # Environment validation script
 │   ├── create-admin.ts     # Script to create admin users
-│   └── run-next-build.cjs  # Next.js build runner script
+│   ├── debug-cert.js       # Certificate debugging script
+│   ├── run-next-build.cjs  # Next.js build runner script
+│   └── update-ngrok-env.mjs # Ngrok environment update script
 
 └── src/
     ├── __tests__/          # Test files
@@ -137,7 +142,21 @@
     │   │   │   │   └── payment-management-provider.tsx # Payment management provider
     │   │   │   ├── pay/
     │   │   │   │   ├── page.tsx # Payment processing page
-    │   │   │   │   └── payment-confirmation.tsx # Payment confirmation component
+    │   │   │   │   ├── payment-confirmation.tsx # Payment confirmation component
+    │   │   │   │   ├── types.ts # Payment-related TypeScript types
+    │   │   │   │   ├── components/
+    │   │   │   │   │   ├── BoletoPaymentPanel.tsx # Boleto payment panel
+    │   │   │   │   │   ├── CardInlineForm.tsx # Card inline form component
+    │   │   │   │   │   ├── CardPaymentPanel.tsx # Card payment panel
+    │   │   │   │   │   ├── IdentifyForm.tsx # Identity verification form
+    │   │   │   │   │   ├── MethodSelector.tsx # Payment method selector
+    │   │   │   │   │   ├── PixPaymentPanel.tsx # PIX payment panel
+    │   │   │   │   │   └── ui.tsx # Payment UI components
+    │   │   │   │   └── hooks/
+    │   │   │   │       ├── usePaymentData.ts # Payment data hook
+    │   │   │   │       ├── usePaymentNavGuard.ts # Payment navigation guard hook
+    │   │   │   │       ├── usePaymentPolling.ts # Payment polling hook
+    │   │   │   │       └── usePaymentState.ts # Payment state management hook
     │   │   │   └── plan/
     │   │   │       └── page.tsx # Plan selection/change page
     │   │   ├── calendar/
@@ -151,7 +170,8 @@
     │   │   │       ├── page.tsx # Profile completion page
     │   │   │       └── profile-completion-form.tsx # Profile completion form component
     │   │   ├── settings/
-    │   │   │   └── page.tsx    # User account settings
+    │   │   │   ├── page.tsx    # User account settings
+    │   │   │   └── settings-client.tsx # Client-side settings component
     │   │   └── support/
     │   │       └── page.tsx    # Support page
     │   │
@@ -182,6 +202,8 @@
     │   │   ├── debug/
     │   │   │   ├── db/
     │   │   │   │   └── route.ts # Database debugging endpoint
+    │   │   │   ├── efi-config/
+    │   │   │   │   └── route.ts # EFI configuration debugging endpoint
     │   │   │   └── payment-test/
     │   │   │       └── route.ts # Payment testing endpoint
     │   │   │
@@ -233,8 +255,14 @@
     │   │       └── efi/
     │   │           └── route.ts # Handles incoming webhooks from Efi (e.g., payment success)
     │   │
+    │   ├── auth/
+    │   │   └── redirect/
+    │   │       └── page.tsx  # Authentication redirect handler
+    │   │
+    │   ├── error.tsx         # Global error page
     │   ├── globals.css       # Global styles for Tailwind CSS
     │   ├── layout.tsx        # Root layout of the entire application
+    │   ├── not-found.tsx     # 404 not found page
     │   └── page.tsx          # Your public landing/home page
     │
     ├── components/
@@ -262,13 +290,9 @@
     │   │   └── subscription-status.tsx
     │   │
     │   └── layout/           # Major layout components
-    │       ├── admin-navigation.tsx
-    │       ├── footer.tsx
-    │       ├── header.tsx
     │       ├── index.ts
     │       ├── mobile-navigation.tsx
-    │       ├── profile-menu.tsx
-    │       └── sidebar.tsx
+    │       └── profile-menu.tsx
     │
     ├── hooks/
     │   ├── use-push-manager.ts # Custom hook to manage PWA push notification logic

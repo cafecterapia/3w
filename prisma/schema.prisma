@@ -33,6 +33,11 @@ model User {
   invoices           Invoice[]
   sessions           Session[]
   payments           Payment[]
+  
+  // Provider relationship
+  providerProfile    Provider?
+  // Updated subscription relationship
+  subscriptions      Subscription[]
 }
 
 model Account {
@@ -88,6 +93,7 @@ model Invoice {
 
 enum UserRole {
   USER
+  PROVIDER
   ADMIN
 }
 
@@ -120,4 +126,61 @@ model Payment {
 
   @@index([userId, createdAt])
   @@index([externalId])
+}
+
+// New model to represent a service provider
+model Provider {
+  id           String @id @default(cuid())
+  userId       String @unique // Links to the User account that owns this profile
+  user         User   @relation(fields: [userId], references: [id])
+
+  businessName String
+  slug         String @unique // For clean, shareable URLs (e.g., "teacher-jane")
+
+  // One provider can offer many services
+  services     Service[]
+  // One provider can have many subscriptions from users
+  subscriptions Subscription[]
+}
+
+// New model for the specific services/plans a provider offers
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  slug        String   // For clean service URLs (e.g., "gold-tier-yoga")
+
+  // Every service must belong to exactly one provider
+  providerId  String
+  provider    Provider @relation(fields: [providerId], references: [id])
+
+  // A service can be attached to many user subscriptions
+  subscriptions Subscription[]
+
+  // Enforces that a service slug is unique *per provider*
+  @@unique([providerId, slug])
+}
+
+// New Subscription model to act as the central link
+model Subscription {
+  id                String   @id @default(cuid())
+  status            String   // e.g., "active", "canceled", "past_due"
+  currentPeriodEnd  DateTime
+  efiSubscriptionId String?  @unique
+
+  // Connects to the user who is subscribing
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+
+  // Connects to the provider being subscribed to
+  providerId        String
+  provider          Provider @relation(fields: [providerId], references: [id])
+
+  // Connects to the specific service being subscribed to
+  serviceId         String
+  service           Service  @relation(fields: [serviceId], references: [id])
+
+  @@index([userId])
+  @@index([providerId])
 }

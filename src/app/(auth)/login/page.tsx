@@ -1,68 +1,44 @@
 'use client';
 
-import { useEffect, useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
-import { loginUser, LoginState } from './actions';
-import { useActionState } from '@/lib/useActionState';
+import { signIn, useSession, getSession } from 'next-auth/react';
 
 export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState<LoginState>(
-    loginUser,
-    {}
-  );
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleNextAuthSignIn = useCallback(async () => {
-    try {
-      // Get the form data
-      const form = document.querySelector('form') as HTMLFormElement | null;
-      const formData = new FormData(form ?? undefined);
-      const email = (formData.get('email') as string) || '';
-      const password = (formData.get('password') as string) || '';
-
-      // Now use NextAuth to actually sign in
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.ok) {
-        // Check the redirect cookie to determine where to go
-        const redirectType = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('pending-redirect='))
-          ?.split('=')[1];
-
-        // Clear the cookie
-        document.cookie = 'pending-redirect=; Max-Age=0; path=/';
-
-        if (redirectType === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/dashboard');
-        }
-      }
-    } catch (error) {
-      console.error('NextAuth sign in error:', error);
-    } finally {
-      // no-op: pending state is controlled by useActionState
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+    const email = String(formData.get('email') || '');
+    const password = String(formData.get('password') || '');
+    if (!email || !password) {
+      setError('Email e senha são obrigatórios.');
+      setIsSubmitting(false);
+      return;
     }
-  }, [router]);
-
-  // Handle successful credential verification
-  useEffect(() => {
-    if (state.message === 'login-success') {
-      handleNextAuthSignIn();
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+    if (result?.error) {
+      setError('Email ou senha inválidos.');
+      setIsSubmitting(false);
+      return;
     }
-  }, [state.message, handleNextAuthSignIn]);
-
-  function handleSubmit(formData: FormData) {
-    // Trigger the server action; hook exposes isPending while it runs
-    formAction(formData);
+    // Force fetch updated session to read role reliably
+    const fresh = await getSession();
+    const role = (fresh?.user as any)?.role;
+    if (role === 'ADMIN') router.push('/admin');
+    else router.push('/dashboard');
   }
 
   return (
@@ -75,14 +51,13 @@ export default function LoginPage() {
           <p className="mt-3 text-center text-accent">
             Acesse faturas, assinaturas e notificações com segurança.
           </p>
-          {state.message ? (
+          {error ? (
             <p role="alert" className="mt-4 text-center text-sm text-[crimson]">
-              {state.message}
+              {error}
             </p>
           ) : null}
         </header>
-
-        <form action={handleSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -170,10 +145,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isSubmitting}
             className="inline-flex w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-secondary tracking-tight transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isPending ? 'Entrando…' : 'Entrar'}
+            {isSubmitting ? 'Entrando…' : 'Entrar'}
           </button>
 
           <div className="h-px w-full bg-border" />

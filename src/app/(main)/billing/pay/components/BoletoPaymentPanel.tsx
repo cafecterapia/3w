@@ -8,10 +8,12 @@ export function BoletoPaymentPanel({
   paymentData,
   onCancel,
   paymentStatus,
+  error,
 }: {
   paymentData: BoletoPaymentData | null;
   onCancel: () => void;
   paymentStatus: 'pending' | 'paid' | 'expired' | 'cancelled';
+  error?: string | null;
 }) {
   return (
     <div className="space-y-6">
@@ -29,6 +31,37 @@ export function BoletoPaymentPanel({
         </span>
       </div>
 
+      {error && !paymentData && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-4 text-sm text-left space-y-2">
+          <div className="flex items-start gap-2">
+            <svg
+              className="h-4 w-4 text-red-600"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M12 9v4m0 4h.01M10.29 3.86l-7.5 12.99A2 2 0 004.5 20h15a2 2 0 001.71-3.15l-7.5-12.99a2 2 0 00-3.42 0z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <div className="flex-1">
+              <p className="font-medium text-red-800 text-xs">
+                Não foi possível gerar o boleto.
+              </p>
+              <p className="mt-1 text-[11px] text-red-700 leading-snug break-words">
+                {error}
+              </p>
+              <p className="mt-2 text-[11px] text-gray-600">
+                Você pode tentar novamente mais tarde ou escolher outro método
+                de pagamento.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {paymentData ? (
         <div className="rounded-md border bg-gray-50 p-4 text-sm space-y-3">
           {paymentData.billetLink && (
@@ -61,7 +94,7 @@ export function BoletoPaymentPanel({
             ID da cobrança: {paymentData.chargeId}
           </div>
         </div>
-      ) : (
+      ) : !error ? (
         <div className="flex flex-col items-center justify-center rounded-md border bg-gray-50 p-6 text-center">
           <div className="relative h-8 w-8">
             <span className="absolute inset-0 rounded-full border-2 border-gray-200"></span>
@@ -69,14 +102,16 @@ export function BoletoPaymentPanel({
           </div>
           <h3 className="mt-3 text-sm font-medium">Gerando seu boleto</h3>
         </div>
-      )}
+      ) : null}
 
-      <div className="text-center">
-        <p className="text-xs text-gray-600">
-          A compensação pode levar até 1-2 dias úteis. Enviaremos confirmação
-          automática.
-        </p>
-      </div>
+      {!error && (
+        <div className="text-center">
+          <p className="text-xs text-gray-600">
+            A compensação pode levar até 1-2 dias úteis. Enviaremos confirmação
+            automática.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

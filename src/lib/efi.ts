@@ -333,10 +333,68 @@ export class EfiService {
       };
 
       const apiParams = this.getPayeeRequestOptions();
+      // Enhanced DEBUG logging to diagnose Unauthorized issues (do not log secrets)
+      try {
+        const logLevel = (process.env.EFI_LOG_LEVEL || '').toLowerCase();
+        if (logLevel === 'debug' || process.env.NODE_ENV !== 'production') {
+          const maskedCpf = params.customer.cpf
+            ? params.customer.cpf
+                .replace(/\D/g, '')
+                .replace(/^(\d{3})\d{5}(\d{2})$/, '$1*****$2')
+            : undefined;
+          const sanitizedBody = {
+            ...requestBody,
+            payment: {
+              banking_billet: {
+                ...requestBody.payment.banking_billet,
+                customer: {
+                  ...requestBody.payment.banking_billet.customer,
+                  cpf: maskedCpf,
+                },
+              },
+            },
+          };
+          const cfgStatus = getEfiConfigStatus();
+          console.log('[EFI][DEBUG] Initiating boleto charge', {
+            at: new Date().toISOString(),
+            environment: cfgStatus.environment,
+            sandbox: cfgStatus.sandbox,
+            usingBase64Cert: cfgStatus.usingBase64,
+            hasCertPassphrase: cfgStatus.hasPassphrase,
+            certificatePath: cfgStatus.certificatePath,
+            payeeHeaderPresent: !!(apiParams as any)?.headers?.[
+              'x-efipay-account-id'
+            ],
+            payeeHeaderValue:
+              (apiParams as any)?.headers?.['x-efipay-account-id']?.slice?.(
+                0,
+                6
+              ) + '***',
+            requestHash: crypto
+              .createHash('sha256')
+              .update(JSON.stringify(sanitizedBody))
+              .digest('hex')
+              .slice(0, 16),
+            requestBody: sanitizedBody,
+          });
+        }
+      } catch (logErr) {
+        console.warn('[EFI][DEBUG] Failed to emit boleto debug log:', logErr);
+      }
       const response = await (this.client as any).createOneStepCharge(
         apiParams,
         requestBody
       );
+      try {
+        const logLevel = (process.env.EFI_LOG_LEVEL || '').toLowerCase();
+        if (logLevel === 'debug' || process.env.NODE_ENV !== 'production') {
+          console.log('[EFI][DEBUG] Boleto charge API raw response keys', {
+            keys: Object.keys(response || {}),
+            dataKeys: Object.keys(response?.data || {}),
+            status: response?.status,
+          });
+        }
+      } catch {}
 
       return response.data;
     } catch (error) {
@@ -369,6 +427,24 @@ export class EfiService {
 
       const configStatus = getEfiConfigStatus();
       console.error('[EFI] Current config status:', configStatus);
+      // Extra granular diagnostics (safe subset) when Unauthorized
+      if ((status === 401 || status === 403) && data) {
+        try {
+          console.error('[EFI] Unauthorized details (safe subset):', {
+            hasClientId: !!process.env.EFI_CLIENT_ID,
+            hasClientSecret: !!process.env.EFI_CLIENT_SECRET,
+            hasPayeeCode: !!process.env.EFI_PAYEE_CODE,
+            payeeCodePrefix: process.env.EFI_PAYEE_CODE?.slice(0, 6) + '***',
+            environment: process.env.EFI_ENVIRONMENT,
+            sdkOptions: {
+              sandbox: options.sandbox,
+              hasCertificate: !!options.certificate,
+              hasPassphrase: !!options.passphrase,
+            },
+            responseHeaders: Object.keys(headers),
+          });
+        } catch {}
+      }
 
       throw error;
     }

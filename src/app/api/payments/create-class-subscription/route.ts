@@ -10,11 +10,15 @@ export async function POST(request: NextRequest) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json({
-        success: true,
-        requiresAuth: true,
-        message: 'Authentication required.',
-      });
+      // Mark as an authentication error (success: false) so clients don't treat this as a valid flow
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          message: 'Authentication required.',
+        },
+        { status: 401 }
+      );
     }
 
     const planSelection: PlanSelection = await request.json();

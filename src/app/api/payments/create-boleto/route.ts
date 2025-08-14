@@ -63,6 +63,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Reuse existing pending boleto (avoid creating multiple identical charges)
+    const existing = await (prisma as any).payment.findFirst({
+      where: {
+        userId: user.id,
+        method: 'boleto',
+        status: 'PENDING',
+        amount: amountCents,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (existing) {
+      console.log('[API][create-boleto] Reusing existing pending boleto', {
+        paymentId: existing.id,
+        externalId: existing.externalId,
+      });
+
+      // Refresh user payment linkage if missing
+      try {
+        if (user.efiSubscriptionId !== existing.externalId) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              efiSubscriptionId: existing.externalId,
+              subscriptionStatus: 'PENDING',
+              paymentCreatedAt: existing.createdAt ?? new Date(),
+            },
+          });
+        }
+      } catch (linkErr) {
+        console.warn(
+          '[API][create-boleto] Failed to refresh user linkage for reused boleto',
+          linkErr
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        chargeId: existing.externalId,
+        billetLink: existing.boletoLink,
+        billetPdfUrl: existing.boletoPdfUrl,
+        barcode: existing.boletoBarcode,
+        reused: true,
+      });
+    }
+
     const created = await efiService.createBoletoCharge({
       description,
       amountCents,
@@ -112,9 +158,42 @@ export async function POST(request: NextRequest) {
       billetLink,
       billetPdfUrl,
       barcode,
+      reused: false,
     });
   } catch (error) {
-    console.error('Error creating boleto charge:', error);
+    const err: any = error;
+    console.error('Error creating boleto charge:', err);
+    try {
+      const status = err?.response?.status;
+      const data = err?.response?.data;
+      const headers = err?.response?.headers;
+      console.error('[API][create-boleto] Detailed error context:', {
+        at: new Date().toISOString(),
+        httpStatus: status,
+        efipayRequestId:
+          headers?.['x-efipay-request-id'] || headers?.['x-request-id'] || null,
+        mensagem: data?.mensagem,
+        nome: data?.nome,
+        error: data?.erro || data?.error,
+        error_description: data?.error_description,
+        code: data?.code || err?.code,
+        hasClientId: !!process.env.EFI_CLIENT_ID,
+        hasClientSecret: !!process.env.EFI_CLIENT_SECRET,
+        hasPayeeCode: !!process.env.EFI_PAYEE_CODE,
+        payeeCodePrefix: process.env.EFI_PAYEE_CODE?.slice(0, 6) + '***',
+        environment: process.env.EFI_ENVIRONMENT,
+      });
+      if (data) {
+        try {
+          console.error(
+            '[API][create-boleto] Raw response snippet:',
+            typeof data === 'string'
+              ? data.slice(0, 500)
+              : JSON.stringify(data, null, 2).slice(0, 1000)
+          );
+        } catch {}
+      }
+    } catch {}
     const statusCode = (error as any)?.response?.status as number | undefined;
     const apiMsg = (error as any)?.response?.data?.mensagem as
       | string

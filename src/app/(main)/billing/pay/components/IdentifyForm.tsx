@@ -69,12 +69,38 @@ export function IdentifyForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPhone]);
 
+  // Format CPF as 000.000.000-00 while typing (allow partial formatting)
   const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 11) {
-      return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    const numbers = value.replace(/\D/g, '').slice(0, 11);
+    let result = numbers;
+    if (numbers.length > 9) {
+      result = numbers.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{0,2})/,
+        (_m, a, b, c, d) => (d ? `${a}.${b}.${c}-${d}` : `${a}.${b}.${c}`)
+      );
+    } else if (numbers.length > 6) {
+      result = numbers.replace(/(\d{3})(\d{3})(\d{0,3})/, (_m, a, b, c) =>
+        c ? `${a}.${b}.${c}` : `${a}.${b}`
+      );
+    } else if (numbers.length > 3) {
+      result = numbers.replace(/(\d{3})(\d{0,3})/, (_m, a, b) =>
+        b ? `${a}.${b}` : a
+      );
     }
-    return value;
+    return result;
+  };
+
+  // Format phone number as (00) 00000-0000 (or (00) 0000-0000 for 10 digits) while typing
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) {
+      // Landline pattern (2+4+4)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+    // Mobile pattern (2+5+4)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
   const isValid = useMemo(() => {
@@ -179,7 +205,10 @@ export function IdentifyForm({
             disabled={!!disabled || !!isPending}
             value={formData.phone_number}
             onChange={(e) =>
-              setFormData((p) => ({ ...p, phone_number: e.target.value }))
+              setFormData((p) => ({
+                ...p,
+                phone_number: formatPhone(e.target.value),
+              }))
             }
             onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
             placeholder="(11) 91234-5678"

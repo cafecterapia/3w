@@ -36,6 +36,8 @@ export default function PaymentConfirmation({
   const [initialName, setInitialName] = useState('');
   const [initialCpf, setInitialCpf] = useState('');
   const [initialPhone, setInitialPhone] = useState('');
+  // Allow editing profile info after initial identification without resetting payment phase
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const { sessionStatus, isPending, createPaymentFromProfile, cancelPayment } =
     usePaymentData({
@@ -102,7 +104,12 @@ export default function PaymentConfirmation({
       setInitialName(values.name);
       setInitialCpf(values.cpf);
       setInitialPhone(values.phone_number);
-      state.setPhase('method');
+      // Only advance phase the first time (when still identifying). If user is editing later, just exit edit mode.
+      if (state.phase === 'identify') {
+        state.setPhase('method');
+      } else {
+        setIsEditingProfile(false);
+      }
       return;
     }
 
@@ -124,6 +131,11 @@ export default function PaymentConfirmation({
       setInitialName(values.name);
       setInitialCpf(values.cpf);
       setInitialPhone(values.phone_number);
+      if (state.phase === 'identify') {
+        state.setPhase('method');
+      } else {
+        setIsEditingProfile(false);
+      }
     } catch (err) {
       // Error already set by createPaymentFromProfile
     }
@@ -141,26 +153,31 @@ export default function PaymentConfirmation({
       // Create boleto
       fetch('/api/payments/create-boleto', { method: 'POST' })
         .then(async (res) => {
-          if (!res.ok) throw new Error('Falha ao criar boleto.');
-          const data = await res.json();
-          if (data.success) {
-            state.setPaymentData({
-              kind: 'boleto',
-              chargeId: data.chargeId,
-              billetLink: data.billetLink,
-              billetPdfUrl: data.billetPdfUrl,
-              barcode: data.barcode,
-            });
-            state.setCurrentTxid(data.chargeId);
-            const newUrl = `${window.location.pathname}?txid=${data.chargeId}`;
-            window.history.replaceState({}, '', newUrl);
-          } else {
-            state.setError(data.message || 'Erro ao criar boleto.');
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.success) {
+            state.setError(
+              data?.message ||
+                'Não foi possível gerar o boleto. Tente novamente ou escolha outro método.'
+            );
+            return;
           }
+          state.setPaymentData({
+            kind: 'boleto',
+            chargeId: data.chargeId,
+            billetLink: data.billetLink,
+            billetPdfUrl: data.billetPdfUrl,
+            barcode: data.barcode,
+          });
+          state.setError(null);
+          state.setCurrentTxid(data.chargeId);
+          const newUrl = `${window.location.pathname}?txid=${data.chargeId}`;
+          window.history.replaceState({}, '', newUrl);
         })
         .catch((err) => {
           console.error(err);
-          state.setError('Erro ao criar boleto.');
+          state.setError(
+            'Não foi possível gerar o boleto. Tente novamente mais tarde ou escolha outro método.'
+          );
         });
     }
   };
@@ -250,8 +267,12 @@ export default function PaymentConfirmation({
     );
   }
 
-  // Error state (except for paid status)
-  if (state.error && state.paymentStatus !== 'paid') {
+  // Global error state (except for paid status) - exclude inline boleto generation errors shown inside panel
+  const showGlobalError =
+    state.error &&
+    state.paymentStatus !== 'paid' &&
+    !(state.selectedMethod === 'boleto' && state.phase === 'pay');
+  if (showGlobalError) {
     return (
       <div className="mx-auto max-w-lg">
         <div className="rounded-lg border bg-gray-50 p-4">
@@ -342,13 +363,22 @@ export default function PaymentConfirmation({
                 </svg>
                 <h2 className="text-sm font-medium">Informações pessoais</h2>
               </div>
-              {state.phase !== 'identify' && (
+              {state.phase !== 'identify' && !isEditingProfile && (
                 <button
                   type="button"
-                  onClick={() => state.setPhase('identify')}
+                  onClick={() => setIsEditingProfile(true)}
                   className="text-xs underline text-gray-900 hover:opacity-80"
                 >
                   Editar
+                </button>
+              )}
+              {state.phase !== 'identify' && isEditingProfile && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingProfile(false)}
+                  className="text-xs underline text-gray-900 hover:opacity-80"
+                >
+                  Cancelar
                 </button>
               )}
             </div>
@@ -356,7 +386,8 @@ export default function PaymentConfirmation({
               initialName={initialName}
               initialCpf={initialCpf}
               initialPhone={initialPhone}
-              disabled={state.phase !== 'identify'}
+              // Editable if still in identify phase or user explicitly enabled edit mode
+              disabled={!(state.phase === 'identify' || isEditingProfile)}
               error={state.error}
               isPending={isPending}
               onSubmit={handleIdentifySubmit}
@@ -458,6 +489,7 @@ export default function PaymentConfirmation({
                       }
                       onCancel={handleCancel}
                       paymentStatus={state.paymentStatus}
+                      error={state.paymentData ? null : state.error}
                     />
                   )}
                 </>

@@ -67,12 +67,20 @@ export function PricingWidget({
 
         const data = await response.json();
 
+        // Redirect to login if auth is required (server now returns 401 with success:false)
+        if (data.requiresAuth) {
+          window.location.href = '/login?redirect=/billing';
+          return;
+        }
+
         if (data.success && data.paymentConfirmationUrl) {
           window.location.href = data.paymentConfirmationUrl;
-        } else {
-          // Handle cases where the API returns a success but no payment URL
-          setError('Could not retrieve payment URL. Please try again.');
+          return;
         }
+
+        setError(
+          data.message || 'Could not retrieve payment URL. Please try again.'
+        );
       } catch (err) {
         console.error('Error:', err);
         setError(

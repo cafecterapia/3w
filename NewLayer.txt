@@ -1,0 +1,32 @@
+└── src/
+    ├── app/
++   │   ├── (provider)/                     # ROUTE GROUP: For all provider-related pages
++   │   │   └── providers/
++   │   │       ├── [providerSlug]/
++   │   │       │   ├── dashboard/
++   │   │       │   │   └── page.tsx        # Provider's main dashboard
++   │   │       │   ├── services/
++   │   │       │   │   ├── page.tsx        # Page to manage services/plans
++   │   │       │   │   └── service-editor.tsx # Component to create/edit a service
++   │   │       │   ├── subscribers/
++   │   │       │   │   └── page.tsx        # Page to view list of subscribers
++   │   │       │   └── [serviceSlug]/
++   │   │       │       └── page.tsx        # THE PUBLIC, SHARABLE SERVICE LANDING PAGE
++   │   │       └── layout.tsx              # Layout for the provider section
+    │   ├── api/
++   │   │   └── provider/
++   │   │       └── services/
++   │   │           └── route.ts            # API for providers to manage their services
+    │
+    ├── components/
++   │   ├── provider/                       # Reusable components for the provider interface
++   │   │   ├── provider-header.tsx         # Header for the provider dashboard
++   │   │   └── provider-nav.tsx            # Navigation for the provider dashboard
++   │   └── features/
++   │       └── subscribe-button.tsx        # Client component for the service landing page
+    │
+    ├── lib/
++   │   └── providers.ts                    # Backend functions for provider logic & security
+    │
+    └── types/
+       └── provider.ts                     # TypeScript types for Provider, Service, etc.
